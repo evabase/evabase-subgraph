@@ -1,0 +1,12 @@
+type FlowEntity @entity(immutable: true) {
+  id: ID!
+  flowStatus: Int!
+  keepNetWork: Int!
+  admin: String!
+  lastKeeper: String!
+  lastVersionflow: String!
+  lastExecNumber: BigInt!
+  maxVaildBlockNumber: BigInt!
+  flowName: String!
+  checkData: Bytes!
+}

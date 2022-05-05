@@ -1,0 +1,5 @@
+build/
+src/types/
+.DS_STORE
+yarn-error.log
+node_modules/

@@ -1,0 +1,24 @@
+{
+  "name": "evabase-subgraph",
+  "version": "1.0.0",
+  "repository": "https://github.com/evabase/evabase-subgraph",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ evabase-subgraph",
+    "create-local": "graph create --node http://localhost:8020/ evabase-subgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ evabase-subgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 evabase-subgraph"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.29.1",
+    "@graphprotocol/graph-ts": "0.26.0",
+    "@typescript-eslint/eslint-plugin": "^4.33.0",
+    "@typescript-eslint/parser": "^4.33.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.6.0",
+    "typescript": "^4.6.2"
+  }
+}

@@ -1,0 +1,40 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: EvaFlowController
+    network: rinkeby
+    source:
+      address: '0x93821553172b6A6745eEcB2e90f8c07f2fe24AAb'
+      abi: EvaFlowController
+      startBlock: 10603303
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - FlowEntity
+      abis:
+        - name: EvaFlowController
+          file: ./abis/EvaFlowController.json
+      eventHandlers:
+        - event: FlowCreated(indexed address,indexed uint256,address,bytes,uint256)
+          handler: handleFlowCreated
+        - event: FlowDestroyed(indexed address,uint256)
+          handler: handleFlowDestroyed
+        - event: FlowExecuteFailed(indexed address,indexed uint256,uint120,uint120,uint256,string)
+          handler: handleFlowExecuteFailed
+        - event: FlowExecuteSuccess(indexed address,indexed uint256,uint120,uint120,uint256)
+          handler: handleFlowExecuteSuccess
+        - event: FlowPaused(indexed address,uint256)
+          handler: handleFlowPaused
+        - event: FlowStart(indexed address,uint256)
+          handler: handleFlowStart
+        - event: FlowUpdated(indexed address,uint256,address)
+          handler: handleFlowUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: SetMinConfig(indexed address,address,address,uint64,uint64,uint16,uint16)
+          handler: handleSetMinConfig
+      file: ./src/mapping.ts
