@@ -4,7 +4,7 @@ import { EvaFlowController } from '../generated/EvaFlowController/EvaFlowControl
 import { FlowEntity } from "../generated/schema"
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-export const EVAFLOW_CONTROLLER_ADDRESS = '0x5C0xc52Ea2DD52D4954ECb4dC5BC672B7E25b771bae669bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
+export const EVAFLOW_CONTROLLER_ADDRESS = '0x93821553172b6A6745eEcB2e90f8c07f2fe24AAb'
 export let ZERO= 0
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -18,6 +18,16 @@ export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
     bd = bd.times(BigDecimal.fromString('10'))
   }
   return bd
+}
+
+export enum FlowFunction {
+  FlowDestroyed,
+  FlowExecuteFailed,
+  FlowExecuteSuccess,
+  FlowPaused,
+  FlowStart,
+  FlowUpdated,
+
 }
 
 export function bigDecimalExp18(): BigDecimal {
@@ -45,7 +55,7 @@ export function isNullEthValue(value: string): boolean {
   return value == '0x0000000000000000000000000000000000000000000000000000000000000001'
 }
 
-export function saveFlow(flow: FlowEntity) : void{
+export function saveFlow(flow: FlowEntity): void {
   // static definitions overrides
 
   let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
@@ -53,7 +63,7 @@ export function saveFlow(flow: FlowEntity) : void{
   // try types string and bytes32 for symbol
   let result = contract.getFlowMetas(BigInt.fromString(flow.id))
   if (result) {
-    flow.flowStatus =result.flowStatus
+    flow.flowStatus = result.flowStatus
     flow.keepNetWork = result.keepNetWork
     flow.flowName = result.flowName
     flow.lastKeeper = result.lastKeeper.toHexString()
@@ -62,10 +72,38 @@ export function saveFlow(flow: FlowEntity) : void{
     flow.lastVersionflow = result.lastVersionflow.toHexString()
     flow.save()
   }
-
 }
 
+  export function updateFlow(flow: FlowEntity,funType:FlowFunction) : void{
+    // static definitions overrides
+  
+    let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
+  
+    // try types string and bytes32 for symbol
+    let result = contract.getFlowMetas(BigInt.fromString(flow.id))
+    if (result) {
+      if (funType == FlowFunction.FlowDestroyed ||
+        funType == FlowFunction.FlowPaused ||
+        funType == FlowFunction.FlowStart ) { 
+        flow.flowStatus = result.flowStatus
+        flow.lastExecNumber = result.lastExecNumber
+      }
+      if (
+        funType == FlowFunction.FlowUpdated) {
+        flow.flowName = result.flowName
+        flow.lastVersionflow = result.lastVersionflow.toHexString()
+        
+      }
 
+      if (funType == FlowFunction.FlowExecuteFailed ||
+        funType == FlowFunction.FlowExecuteSuccess ||
+        funType == FlowFunction.FlowUpdated) {
+        flow.lastKeeper = result.lastKeeper.toHexString()
+        flow.lastExecNumber = result.lastExecNumber
+      }
 
+      flow.save()
+    }
 
+}
 

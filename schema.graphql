@@ -1,4 +1,4 @@
-type FlowEntity @entity(immutable: true) {
+type FlowEntity @entity {
   id: ID!
   flowStatus: Int!
   keepNetWork: Int!
