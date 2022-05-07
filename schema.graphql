@@ -3,10 +3,46 @@ type FlowEntity @entity {
   flowStatus: Int!
   keepNetWork: Int!
   admin: String!
-  lastKeeper: String!
-  lastVersionflow: String!
-  lastExecNumber: BigInt!
-  maxVaildBlockNumber: BigInt!
+  lastKeeper: String
+  lastVersionflow: String
+  lastExecNumber: BigInt
+  maxVaildBlockNumber: BigInt
   flowName: String!
-  checkData: Bytes!
+  input: Bytes!
+  details: [FlowHistory!]!
 }
+
+type FlowHistory @entity(immutable: true) {
+  #event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+  id: ID!
+  # orderId: String
+  gasUsed: BigInt
+  blockTime: BigInt
+}
+
+# type NftOrder @entity {
+#   id: ID!
+#   orderStatus: Int
+#   owner: String #拥有人
+#   assetToken: String #资产合约地址
+#   amount: BigInt #NFT数量
+#   price: BigInt #NFT价格
+#   expireTime: BigInt #订单过期时间 s
+#   tokenId: BigInt
+#   salt: BigInt #随机数
+#   input: Bytes
+#   # details: [FlowHistory]
+# }
+
+# type Erc20Order @entity {
+#   id: ID!
+#   orderStatus: Int!
+#   owner: String!
+#   inputAmount: BigInt!
+#   inputToken: String!
+#   minRate: BigInt!
+#   outputToken: String!
+#   expiration: BigInt!
+#   receiptor: String!
+#   minInputPer: BigInt!
+# }

@@ -1,7 +1,8 @@
 /* eslint-disable prefer-const */
-import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
+import { log, BigInt, BigDecimal, Address, Bytes,ethereum,ByteArray } from '@graphprotocol/graph-ts'
 import { EvaFlowController } from '../generated/EvaFlowController/EvaFlowController'
-import { FlowEntity } from "../generated/schema"
+import { FlowEntity,FlowHistory } from "../generated/schema"
+
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const EVAFLOW_CONTROLLER_ADDRESS = '0x93821553172b6A6745eEcB2e90f8c07f2fe24AAb'
@@ -74,7 +75,7 @@ export function saveFlow(flow: FlowEntity): void {
   }
 }
 
-  export function updateFlow(flow: FlowEntity,funType:FlowFunction) : void{
+export function updateFlow(flow: FlowEntity,funType:FlowFunction) : void{
     // static definitions overrides
   
     let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
@@ -105,5 +106,35 @@ export function saveFlow(flow: FlowEntity): void {
       flow.save()
     }
 
+}
+
+export function saveFlowHistory(flowHistory: FlowHistory, event: ethereum.Event,fee:BigInt): void {
+  
+  flowHistory.blockTime = event.block.timestamp
+  flowHistory.gasUsed = ZERO_BI
+  flowHistory.save()
+
+}
+
+export function paraOrderInput(input: Bytes,flowHistory: FlowHistory): void {
+  // let decoded =  ethers.utils.AbiCoder.prototype.decode(['address', 'uint8', 'bytes'],input)  
+  // const functionInput = input.subarray(4);
+
+  const inputDataHexString = input.toHexString().slice(10); //take away function signature: '0x????????'
+  const hexStringToDecode = '0x0000000000000000000000000000000000000000000000000000000000000020' + inputDataHexString; // prepend tuple offset
+  let functionInput= Bytes.fromByteArray(Bytes.fromHexString(hexStringToDecode));
+  
+  
+  let origin = ethereum.decode('address,uint8,bytes', functionInput)
+  if (origin) {
+    let decoded =origin.toTuple()
+    let dest = decoded[0]
+    let howToCall = decoded[1]
+    let calldata = decoded[2]
+    flowHistory.orderId = dest.toAddress().toHexString()
+    flowHistory.gasUsed = howToCall.toBigInt()
+    flowHistory.save ()
+  }
+  
 }
 

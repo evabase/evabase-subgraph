@@ -105,21 +105,112 @@ export class FlowEntity extends Entity {
     this.set("maxVaildBlockNumber", Value.fromBigInt(value));
   }
 
-  get flowName(): string {
+  get flowName(): string | null {
     let value = this.get("flowName");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set flowName(value: string | null) {
+    if (!value) {
+      this.unset("flowName");
+    } else {
+      this.set("flowName", Value.fromString(<string>value));
+    }
+  }
+
+  get input(): Bytes | null {
+    let value = this.get("input");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set input(value: Bytes | null) {
+    if (!value) {
+      this.unset("input");
+    } else {
+      this.set("input", Value.fromBytes(<Bytes>value));
+    }
+  }
+
+  get details(): Array<string> {
+    let value = this.get("details");
+    return value!.toStringArray();
+  }
+
+  set details(value: Array<string>) {
+    this.set("details", Value.fromStringArray(value));
+  }
+}
+
+export class FlowHistory extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save FlowHistory entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type FlowHistory must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("FlowHistory", id.toString(), this);
+    }
+  }
+
+  static load(id: string): FlowHistory | null {
+    return changetype<FlowHistory | null>(store.get("FlowHistory", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
     return value!.toString();
   }
 
-  set flowName(value: string) {
-    this.set("flowName", Value.fromString(value));
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
   }
 
-  get checkData(): Bytes {
-    let value = this.get("checkData");
-    return value!.toBytes();
+  get gasUsed(): BigInt | null {
+    let value = this.get("gasUsed");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set checkData(value: Bytes) {
-    this.set("checkData", Value.fromBytes(value));
+  set gasUsed(value: BigInt | null) {
+    if (!value) {
+      this.unset("gasUsed");
+    } else {
+      this.set("gasUsed", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get blockTime(): BigInt | null {
+    let value = this.get("blockTime");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set blockTime(value: BigInt | null) {
+    if (!value) {
+      this.unset("blockTime");
+    } else {
+      this.set("blockTime", Value.fromBigInt(<BigInt>value));
+    }
   }
 }
