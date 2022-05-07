@@ -6,6 +6,8 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
+    "auth": "graph auth --studio",
+    "evabase": "graph deploy --studio evabase",
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ evabase-subgraph",
     "create-local": "graph create --node http://localhost:8020/ evabase-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ evabase-subgraph",
@@ -20,5 +22,8 @@
     "eslint-config-prettier": "^8.5.0",
     "prettier": "^2.6.0",
     "typescript": "^4.6.2"
+  },
+  "devDependencies": {
+    "matchstick-as": "^0.4.2"
   }
 }
