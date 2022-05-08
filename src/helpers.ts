@@ -64,7 +64,12 @@ export function saveFlow(flow: FlowEntity): void {
   // try types string and bytes32 for symbol
   let result = contract.getFlowMetas(BigInt.fromString(flow.id))
   if (result) {
-    flow.flowStatus = result.flowStatus
+    if (result.flowStatus>1) {
+      flow.flowStatus = 2
+    } else {
+      flow.flowStatus = result.flowStatus
+    }
+   
     flow.keepNetWork = result.keepNetWork
     flow.flowName = result.flowName
     flow.lastKeeper = result.lastKeeper.toHexString()
@@ -86,7 +91,11 @@ export function updateFlow(flow: FlowEntity,funType:FlowFunction) : void{
       if (funType == FlowFunction.FlowDestroyed ||
         funType == FlowFunction.FlowPaused ||
         funType == FlowFunction.FlowStart ) { 
-        flow.flowStatus = result.flowStatus
+          if (result.flowStatus > 1) {
+            flow.flowStatus = 2
+          } else {
+            flow.flowStatus = result.flowStatus
+          }
         flow.lastExecNumber = result.lastExecNumber
       }
       if (
