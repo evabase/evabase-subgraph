@@ -68,7 +68,7 @@ export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
   if (entity) {
     let flowHistoryId = event.transaction.hash.toHexString()
     let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI)
+    saveFlowHistory(flowHistory,event,event.params.payAmountByETH)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails
