@@ -120,7 +120,7 @@ export function updateFlow(flow: FlowEntity,funType:FlowFunction) : void{
 export function saveFlowHistory(flowHistory: FlowHistory, event: ethereum.Event,fee:BigInt): void {
   
   flowHistory.blockTime = event.block.timestamp
-  flowHistory.gasUsed = ZERO_BI
+  flowHistory.gasUsed = fee
   flowHistory.save()
 
 }

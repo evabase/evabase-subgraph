@@ -29,13 +29,11 @@ export function handleFlowCreated(event: FlowCreated): void {
 
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
-    entity = new FlowEntity(flowId)
-    entity.details = []
-    // Entity fields can be set using simple assignments
-  
-
-  // BigInt and BigDecimal math are supported
-
+  entity = new FlowEntity(flowId)
+  let flowHistoryId = event.transaction.hash.toHexString()
+  let flowHistory =  new FlowHistory(flowHistoryId)
+  saveFlowHistory(flowHistory,event,ZERO_BI)
+  entity.details = [flowHistory.id]
   // Entity fields can be set based on event parameters
   entity.admin = event.params.user.toHexString()
   entity.input = event.transaction.input
@@ -46,18 +44,19 @@ export function handleFlowCreated(event: FlowCreated): void {
 export function handleFlowDestroyed(event: FlowDestroyed): void {
   let flowId= event.params.flowId.toString()
   let entity = FlowEntity.load(flowId)
-  event.transaction.hash.toHexString()
 
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new FlowEntity(flowId)
+  if (entity) {
+    let flowHistoryId = event.transaction.hash.toHexString()
+    let flowHistory =  new FlowHistory(flowHistoryId)
+    saveFlowHistory(flowHistory,event,ZERO_BI)
+    let newdetails = entity.details
+    newdetails.push(flowHistory.id)
+    entity.details = newdetails
+    updateFlow(entity,FlowFunction.FlowDestroyed)
 
   }
-
-  
-  updateFlow(entity,FlowFunction.FlowDestroyed)
-
 }
 
 export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
@@ -67,6 +66,12 @@ export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
   if (entity) {
+    let flowHistoryId = event.transaction.hash.toHexString()
+    let flowHistory =  new FlowHistory(flowHistoryId)
+    saveFlowHistory(flowHistory,event,ZERO_BI)
+    let newdetails = entity.details
+    newdetails.push(flowHistory.id)
+    entity.details = newdetails
     updateFlow(entity,FlowFunction.FlowExecuteFailed)
   }
 }
@@ -97,6 +102,12 @@ export function handleFlowPaused(event: FlowPaused): void {
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
   if (entity) {
+    let flowHistoryId = event.transaction.hash.toHexString()
+    let flowHistory =  new FlowHistory(flowHistoryId)
+    saveFlowHistory(flowHistory,event,ZERO_BI)
+    let newdetails = entity.details
+    newdetails.push(flowHistory.id)
+    entity.details = newdetails
     updateFlow(entity,FlowFunction.FlowPaused)
   }
 }
@@ -108,6 +119,12 @@ export function handleFlowStart(event: FlowStart): void {
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
   if (entity) {
+    let flowHistoryId = event.transaction.hash.toHexString()
+    let flowHistory =  new FlowHistory(flowHistoryId)
+    saveFlowHistory(flowHistory,event,ZERO_BI)
+    let newdetails = entity.details
+    newdetails.push(flowHistory.id)
+    entity.details = newdetails
     updateFlow(entity,FlowFunction.FlowStart)
   }
 }
@@ -119,7 +136,13 @@ export function handleFlowUpdated(event: FlowUpdated): void {
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
   if (entity) {
-    updateFlow(entity,FlowFunction.FlowStart)
+    let flowHistoryId = event.transaction.hash.toHexString()
+    let flowHistory =  new FlowHistory(flowHistoryId)
+    saveFlowHistory(flowHistory,event,ZERO_BI)
+    let newdetails = entity.details
+    newdetails.push(flowHistory.id)
+    entity.details = newdetails
+    updateFlow(entity,FlowFunction.FlowUpdated)
   }
 }
 
