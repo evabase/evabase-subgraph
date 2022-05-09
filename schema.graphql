@@ -18,6 +18,10 @@ type FlowHistory @entity(immutable: true) {
   # orderId: String
   gasUsed: BigInt
   blockTime: BigInt
+  action: String
+  from: String
+  ethGasFee: BigInt
+  evaGasFee: BigInt
 }
 
 # type NftOrder @entity {

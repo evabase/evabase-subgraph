@@ -213,4 +213,89 @@ export class FlowHistory extends Entity {
       this.set("blockTime", Value.fromBigInt(<BigInt>value));
     }
   }
+
+  get action(): string | null {
+    let value = this.get("action");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set action(value: string | null) {
+    if (!value) {
+      this.unset("action");
+    } else {
+      this.set("action", Value.fromString(<string>value));
+    }
+  }
+
+  get from(): string | null {
+    let value = this.get("from");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set from(value: string | null) {
+    if (!value) {
+      this.unset("from");
+    } else {
+      this.set("from", Value.fromString(<string>value));
+    }
+  }
+  
+  get tx(): string | null {
+    let value = this.get("tx");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set tx(value: string | null) {
+    if (!value) {
+      this.unset("tx");
+    } else {
+      this.set("tx", Value.fromString(<string>value));
+    }
+  }
+
+  get ethGasFee(): BigInt | null {
+    let value = this.get("ethGasFee");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set ethGasFee(value: BigInt | null) {
+    if (!value) {
+      this.unset("ethGasFee");
+    } else {
+      this.set("ethGasFee", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get evaGasFee(): BigInt | null {
+    let value = this.get("evaGasFee");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set evaGasFee(value: BigInt | null) {
+    if (!value) {
+      this.unset("evaGasFee");
+    } else {
+      this.set("evaGasFee", Value.fromBigInt(<BigInt>value));
+    }
+  }
 }
