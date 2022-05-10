@@ -5,7 +5,7 @@ import { FlowEntity, FlowHistory } from "../generated/schema"
 
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-export const EVAFLOW_CONTROLLER_ADDRESS = '0x93821553172b6A6745eEcB2e90f8c07f2fe24AAb'
+export const EVAFLOW_CONTROLLER_ADDRESS = '0xd595A7BC343575d3ae5b13BF4acC00D446D5a026'
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -18,6 +18,7 @@ export let START = '3'
 export let PAUSE = '4'
 export let SUCCESS = '5'
 export let FAILED = '6'
+export let DESTORY = '7'
 
 
 
@@ -153,7 +154,7 @@ export function paraOrderInput(input: Bytes, flowHistory: FlowHistory): void {
     let dest = decoded[0]
     let howToCall = decoded[1]
     let calldata = decoded[2]
-    flowHistory.orderId = dest.toAddress().toHexString()
+    // flowHistory.orderId = dest.toAddress().toHexString()
     flowHistory.gasUsed = howToCall.toBigInt()
     flowHistory.save()
   }
