@@ -69,44 +69,8 @@ export class FlowEntity extends Entity {
     this.set("admin", Value.fromString(value));
   }
 
-  get lastKeeper(): string {
+  get lastKeeper(): string | null {
     let value = this.get("lastKeeper");
-    return value!.toString();
-  }
-
-  set lastKeeper(value: string) {
-    this.set("lastKeeper", Value.fromString(value));
-  }
-
-  get lastVersionflow(): string {
-    let value = this.get("lastVersionflow");
-    return value!.toString();
-  }
-
-  set lastVersionflow(value: string) {
-    this.set("lastVersionflow", Value.fromString(value));
-  }
-
-  get lastExecNumber(): BigInt {
-    let value = this.get("lastExecNumber");
-    return value!.toBigInt();
-  }
-
-  set lastExecNumber(value: BigInt) {
-    this.set("lastExecNumber", Value.fromBigInt(value));
-  }
-
-  get maxVaildBlockNumber(): BigInt {
-    let value = this.get("maxVaildBlockNumber");
-    return value!.toBigInt();
-  }
-
-  set maxVaildBlockNumber(value: BigInt) {
-    this.set("maxVaildBlockNumber", Value.fromBigInt(value));
-  }
-
-  get flowName(): string | null {
-    let value = this.get("flowName");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -114,29 +78,81 @@ export class FlowEntity extends Entity {
     }
   }
 
-  set flowName(value: string | null) {
+  set lastKeeper(value: string | null) {
     if (!value) {
-      this.unset("flowName");
+      this.unset("lastKeeper");
     } else {
-      this.set("flowName", Value.fromString(<string>value));
+      this.set("lastKeeper", Value.fromString(<string>value));
     }
   }
 
-  get input(): Bytes | null {
-    let value = this.get("input");
+  get lastVersionflow(): string | null {
+    let value = this.get("lastVersionflow");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set input(value: Bytes | null) {
+  set lastVersionflow(value: string | null) {
     if (!value) {
-      this.unset("input");
+      this.unset("lastVersionflow");
     } else {
-      this.set("input", Value.fromBytes(<Bytes>value));
+      this.set("lastVersionflow", Value.fromString(<string>value));
     }
+  }
+
+  get lastExecNumber(): BigInt | null {
+    let value = this.get("lastExecNumber");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set lastExecNumber(value: BigInt | null) {
+    if (!value) {
+      this.unset("lastExecNumber");
+    } else {
+      this.set("lastExecNumber", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get maxVaildBlockNumber(): BigInt | null {
+    let value = this.get("maxVaildBlockNumber");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set maxVaildBlockNumber(value: BigInt | null) {
+    if (!value) {
+      this.unset("maxVaildBlockNumber");
+    } else {
+      this.set("maxVaildBlockNumber", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get flowName(): string {
+    let value = this.get("flowName");
+    return value!.toString();
+  }
+
+  set flowName(value: string) {
+    this.set("flowName", Value.fromString(value));
+  }
+
+  get input(): Bytes {
+    let value = this.get("input");
+    return value!.toBytes();
+  }
+
+  set input(value: Bytes) {
+    this.set("input", Value.fromBytes(value));
   }
 
   get details(): Array<string> {
@@ -247,23 +263,6 @@ export class FlowHistory extends Entity {
       this.set("from", Value.fromString(<string>value));
     }
   }
-  
-  get tx(): string | null {
-    let value = this.get("tx");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set tx(value: string | null) {
-    if (!value) {
-      this.unset("tx");
-    } else {
-      this.set("tx", Value.fromString(<string>value));
-    }
-  }
 
   get ethGasFee(): BigInt | null {
     let value = this.get("ethGasFee");
@@ -296,6 +295,32 @@ export class FlowHistory extends Entity {
       this.unset("evaGasFee");
     } else {
       this.set("evaGasFee", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get success(): boolean {
+    let value = this.get("success");
+    return value!.toBoolean();
+  }
+
+  set success(value: boolean) {
+    this.set("success", Value.fromBoolean(value));
+  }
+
+  get failedReason(): string | null {
+    let value = this.get("failedReason");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set failedReason(value: string | null) {
+    if (!value) {
+      this.unset("failedReason");
+    } else {
+      this.set("failedReason", Value.fromString(<string>value));
     }
   }
 }

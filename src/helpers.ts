@@ -13,12 +13,15 @@ export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 export let CREATE = '1'
-export let UPDATE = '2'
-export let START = '3'
+export let UPGRADE = '2'
+export let EXECUTE= '3'
 export let PAUSE = '4'
-export let SUCCESS = '5'
-export let FAILED = '6'
-export let DESTORY = '7'
+export let DESTROY= '5'
+export let RESTART = '6'
+// export let START = '3'
+// export let SUCCESS = '5'
+// export let FAILED = '6'
+// export let DESTORY = '7'
 
 
 

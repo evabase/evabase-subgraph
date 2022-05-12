@@ -19,12 +19,11 @@ import {
   FlowFunction,
   saveFlowHistory,
   CREATE,
-  DESTORY,
-  FAILED,
-  SUCCESS,
+  DESTROY,
+  EXECUTE,
   PAUSE,
-  START,
-  UPDATE
+  UPGRADE,
+  RESTART
 } from './helpers'
 
 export function handleFlowCreated(event: FlowCreated): void {
@@ -57,7 +56,7 @@ export function handleFlowDestroyed(event: FlowDestroyed): void {
   if (entity) {
     let flowHistoryId = event.transaction.hash.toHexString()
     let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI,DESTORY,ZERO_BI,ZERO_BI)
+    saveFlowHistory(flowHistory,event,ZERO_BI,DESTROY,ZERO_BI,ZERO_BI)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails
@@ -74,8 +73,10 @@ export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
   // `null` checks allow to create entities on demand
   if (entity) {
     let flowHistoryId = event.transaction.hash.toHexString()
-    let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,event.params.gasUsed,FAILED,event.params.payAmountByETH,event.params.payAmountByFeeToken)
+    let flowHistory = new FlowHistory(flowHistoryId)
+    flowHistory.success = false
+    flowHistory.failedReason = event.params.reason
+    saveFlowHistory(flowHistory,event,event.params.gasUsed,EXECUTE,event.params.payAmountByETH,event.params.payAmountByFeeToken)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails
@@ -92,8 +93,9 @@ export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void {
   // `null` checks allow to create entities on demand
   if (entity) {
     let flowHistoryId = event.transaction.hash.toHexString()
-    let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,event.params.gasUsed,SUCCESS,event.params.payAmountByETH,event.params.payAmountByFeeToken)
+    let flowHistory = new FlowHistory(flowHistoryId)
+    flowHistory.success = true
+    saveFlowHistory(flowHistory,event,event.params.gasUsed,EXECUTE,event.params.payAmountByETH,event.params.payAmountByFeeToken)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails
@@ -128,7 +130,7 @@ export function handleFlowStart(event: FlowStart): void {
   if (entity) {
     let flowHistoryId = event.transaction.hash.toHexString()
     let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI,START,ZERO_BI,ZERO_BI)
+    saveFlowHistory(flowHistory,event,ZERO_BI,RESTART,ZERO_BI,ZERO_BI)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails
@@ -145,7 +147,7 @@ export function handleFlowUpdated(event: FlowUpdated): void {
   if (entity) {
     let flowHistoryId = event.transaction.hash.toHexString()
     let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI,UPDATE,ZERO_BI,ZERO_BI)
+    saveFlowHistory(flowHistory,event,ZERO_BI,UPGRADE,ZERO_BI,ZERO_BI)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails

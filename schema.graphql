@@ -22,6 +22,8 @@ type FlowHistory @entity(immutable: true) {
   from: String
   ethGasFee: BigInt
   evaGasFee: BigInt
+  success: Boolean
+  failedReason: String
 }
 
 # type NftOrder @entity {
