@@ -6,9 +6,9 @@ dataSources:
     name: EvaFlowController
     network: rinkeby
     source:
-      address: '0xd595A7BC343575d3ae5b13BF4acC00D446D5a026'
+      address: '0x9E70EF1b4c8D332d76b5e53D4088C43A989466e9'
       abi: EvaFlowController
-      startBlock: 10646715
+      startBlock: 10663083
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

@@ -5,7 +5,7 @@ import { FlowEntity, FlowHistory } from "../generated/schema"
 
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-export const EVAFLOW_CONTROLLER_ADDRESS = '0xd595A7BC343575d3ae5b13BF4acC00D446D5a026'
+export const EVAFLOW_CONTROLLER_ADDRESS = '0x9E70EF1b4c8D332d76b5e53D4088C43A989466e9'
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
