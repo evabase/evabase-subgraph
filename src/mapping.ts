@@ -1,12 +1,10 @@
 import { BigInt ,ethereum} from "@graphprotocol/graph-ts"
 import {
   EvaFlowController,
+  FlowClosed,
   FlowCreated,
-  FlowDestroyed,
   FlowExecuteFailed,
   FlowExecuteSuccess,
-  FlowPaused,
-  FlowStart,
   FlowUpdated,
   OwnershipTransferred,
   SetMinConfig
@@ -19,11 +17,10 @@ import {
   FlowFunction,
   saveFlowHistory,
   CREATE,
-  DESTROY,
-  EXECUTE,
-  PAUSE,
   UPGRADE,
-  RESTART
+  CLOSED,
+  FAILED,
+  SUCCESS
 } from './helpers'
 
 export function handleFlowCreated(event: FlowCreated): void {
@@ -31,14 +28,14 @@ export function handleFlowCreated(event: FlowCreated): void {
   // needs to be unique across all entities of the same type
   // let entity = FlowEntity.load(event.transaction.from.toHex())
   let flowId= event.params.flowId.toString()
-  let entity = FlowEntity.load(flowId)
+//   let entity = FlowEntity.load(flowId)
 
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
-  entity = new FlowEntity(flowId)
-  let flowHistoryId = event.transaction.hash.toHexString()
-  let flowHistory =  new FlowHistory(flowHistoryId)
-  saveFlowHistory(flowHistory,event,ZERO_BI,CREATE,ZERO_BI,ZERO_BI)
+  let entity = new FlowEntity(flowId)
+  let createHash = event.transaction.hash.toHexString()
+  let flowHistory =  new FlowHistory(createHash)
+  saveFlowHistory(flowHistory,event,ZERO_BI,CREATE,ZERO_BI,ZERO_BI,flowId)
   entity.details = [flowHistory.id]
   // Entity fields can be set based on event parameters
   entity.admin = event.params.user.toHexString()
@@ -47,7 +44,7 @@ export function handleFlowCreated(event: FlowCreated): void {
 
 }
 
-export function handleFlowDestroyed(event: FlowDestroyed): void {
+export function handleFlowClosed(event: FlowClosed): void {
   let flowId= event.params.flowId.toString()
   let entity = FlowEntity.load(flowId)
 
@@ -56,12 +53,11 @@ export function handleFlowDestroyed(event: FlowDestroyed): void {
   if (entity) {
     let flowHistoryId = event.transaction.hash.toHexString()
     let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI,DESTROY,ZERO_BI,ZERO_BI)
+    saveFlowHistory(flowHistory,event,ZERO_BI,CLOSED,ZERO_BI,ZERO_BI,flowId)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails
     updateFlow(entity,FlowFunction.FlowDestroyed)
-
   }
 }
 
@@ -76,7 +72,7 @@ export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
     let flowHistory = new FlowHistory(flowHistoryId)
     flowHistory.success = false
     flowHistory.failedReason = event.params.reason
-    saveFlowHistory(flowHistory,event,event.params.gasUsed,EXECUTE,event.params.payAmountByETH,event.params.payAmountByFeeToken)
+    saveFlowHistory(flowHistory,event,event.params.gasUsed,FAILED,event.params.payAmountByETH,event.params.payAmountByFeeToken,flowId)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails
@@ -95,47 +91,13 @@ export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void {
     let flowHistoryId = event.transaction.hash.toHexString()
     let flowHistory = new FlowHistory(flowHistoryId)
     flowHistory.success = true
-    saveFlowHistory(flowHistory,event,event.params.gasUsed,EXECUTE,event.params.payAmountByETH,event.params.payAmountByFeeToken)
+    saveFlowHistory(flowHistory,event,event.params.gasUsed,SUCCESS,event.params.payAmountByETH,event.params.payAmountByFeeToken,flowId)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails
     updateFlow(entity,FlowFunction.FlowExecuteSuccess)
   }
   
-}
-
-export function handleFlowPaused(event: FlowPaused): void {
-  let flowId= event.params.flowId.toString()
-  let entity = FlowEntity.load(flowId)
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity) {
-    let flowHistoryId = event.transaction.hash.toHexString()
-    let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI,PAUSE,ZERO_BI,ZERO_BI)
-    let newdetails = entity.details
-    newdetails.push(flowHistory.id)
-    entity.details = newdetails
-    updateFlow(entity,FlowFunction.FlowPaused)
-  }
-}
-
-export function handleFlowStart(event: FlowStart): void {
-  let flowId= event.params.flowId.toString()
-  let entity = FlowEntity.load(flowId)
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity) {
-    let flowHistoryId = event.transaction.hash.toHexString()
-    let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI,RESTART,ZERO_BI,ZERO_BI)
-    let newdetails = entity.details
-    newdetails.push(flowHistory.id)
-    entity.details = newdetails
-    updateFlow(entity,FlowFunction.FlowStart)
-  }
 }
 
 export function handleFlowUpdated(event: FlowUpdated): void {
@@ -147,7 +109,7 @@ export function handleFlowUpdated(event: FlowUpdated): void {
   if (entity) {
     let flowHistoryId = event.transaction.hash.toHexString()
     let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI,UPGRADE,ZERO_BI,ZERO_BI)
+    saveFlowHistory(flowHistory,event,ZERO_BI,UPGRADE,ZERO_BI,ZERO_BI,flowId)
     let newdetails = entity.details
     newdetails.push(flowHistory.id)
     entity.details = newdetails

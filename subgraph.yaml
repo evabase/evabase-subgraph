@@ -17,20 +17,18 @@ dataSources:
         - FlowEntity
       abis:
         - name: EvaFlowController
-          file: ./abis/EvaFlowController.json
+          file: ./abis/EvaFlowController.abi.json
       eventHandlers:
+        - event: FlowClosed(indexed address,uint256)
+          handler: handleFlowClosed
         - event: FlowCreated(indexed address,indexed uint256,address,bytes,uint256)
           handler: handleFlowCreated
-        - event: FlowDestroyed(indexed address,uint256)
-          handler: handleFlowDestroyed
         - event: FlowExecuteFailed(indexed address,indexed uint256,uint120,uint120,uint256,string)
           handler: handleFlowExecuteFailed
         - event: FlowExecuteSuccess(indexed address,indexed uint256,uint120,uint120,uint256)
           handler: handleFlowExecuteSuccess
-        - event: FlowPaused(indexed address,uint256)
-          handler: handleFlowPaused
-        - event: FlowStart(indexed address,uint256)
-          handler: handleFlowStart
+        - event: FlowOperatorChanged(address,bool)
+          handler: handleFlowOperatorChanged
         - event: FlowUpdated(indexed address,uint256,address)
           handler: handleFlowUpdated
         - event: OwnershipTransferred(indexed address,indexed address)

@@ -10,6 +10,28 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
+export class FlowClosed extends ethereum.Event {
+  get params(): FlowClosed__Params {
+    return new FlowClosed__Params(this);
+  }
+}
+
+export class FlowClosed__Params {
+  _event: FlowClosed;
+
+  constructor(event: FlowClosed) {
+    this._event = event;
+  }
+
+  get user(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get flowId(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+}
+
 export class FlowCreated extends ethereum.Event {
   get params(): FlowCreated__Params {
     return new FlowCreated__Params(this);
@@ -41,28 +63,6 @@ export class FlowCreated__Params {
 
   get fee(): BigInt {
     return this._event.parameters[4].value.toBigInt();
-  }
-}
-
-export class FlowDestroyed extends ethereum.Event {
-  get params(): FlowDestroyed__Params {
-    return new FlowDestroyed__Params(this);
-  }
-}
-
-export class FlowDestroyed__Params {
-  _event: FlowDestroyed;
-
-  constructor(event: FlowDestroyed) {
-    this._event = event;
-  }
-
-  get user(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get flowId(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
   }
 }
 
@@ -138,47 +138,25 @@ export class FlowExecuteSuccess__Params {
   }
 }
 
-export class FlowPaused extends ethereum.Event {
-  get params(): FlowPaused__Params {
-    return new FlowPaused__Params(this);
+export class FlowOperatorChanged extends ethereum.Event {
+  get params(): FlowOperatorChanged__Params {
+    return new FlowOperatorChanged__Params(this);
   }
 }
 
-export class FlowPaused__Params {
-  _event: FlowPaused;
+export class FlowOperatorChanged__Params {
+  _event: FlowOperatorChanged;
 
-  constructor(event: FlowPaused) {
+  constructor(event: FlowOperatorChanged) {
     this._event = event;
   }
 
-  get user(): Address {
+  get op(): Address {
     return this._event.parameters[0].value.toAddress();
   }
 
-  get flowId(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-}
-
-export class FlowStart extends ethereum.Event {
-  get params(): FlowStart__Params {
-    return new FlowStart__Params(this);
-  }
-}
-
-export class FlowStart__Params {
-  _event: FlowStart;
-
-  constructor(event: FlowStart) {
-    this._event = event;
-  }
-
-  get user(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get flowId(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
+  get removed(): boolean {
+    return this._event.parameters[1].value.toBoolean();
   }
 }
 
@@ -397,21 +375,6 @@ export class EvaFlowController extends ethereum.SmartContract {
     return new EvaFlowController("EvaFlowController", address);
   }
 
-  MAX_INT(): BigInt {
-    let result = super.call("MAX_INT", "MAX_INT():(uint256)", []);
-
-    return result[0].toBigInt();
-  }
-
-  try_MAX_INT(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("MAX_INT", "MAX_INT():(uint256)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
   config(): Address {
     let result = super.call("config", "config():(address)", []);
 
@@ -448,6 +411,27 @@ export class EvaFlowController extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  flowOperators(param0: Address): boolean {
+    let result = super.call("flowOperators", "flowOperators(address):(bool)", [
+      ethereum.Value.fromAddress(param0)
+    ]);
+
+    return result[0].toBoolean();
+  }
+
+  try_flowOperators(param0: Address): ethereum.CallResult<boolean> {
+    let result = super.tryCall(
+      "flowOperators",
+      "flowOperators(address):(bool)",
+      [ethereum.Value.fromAddress(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
   getAllVaildFlowSize(keepNetWork: i32): BigInt {
@@ -807,40 +791,6 @@ export class EvaFlowController extends ethereum.SmartContract {
   }
 }
 
-export class ConstructorCall extends ethereum.Call {
-  get inputs(): ConstructorCall__Inputs {
-    return new ConstructorCall__Inputs(this);
-  }
-
-  get outputs(): ConstructorCall__Outputs {
-    return new ConstructorCall__Outputs(this);
-  }
-}
-
-export class ConstructorCall__Inputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
-  }
-
-  get _config(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get _evaSafesFactory(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-}
-
-export class ConstructorCall__Outputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
-  }
-}
-
 export class AddFundByUserCall extends ethereum.Call {
   get inputs(): AddFundByUserCall__Inputs {
     return new AddFundByUserCall__Inputs(this);
@@ -904,7 +854,7 @@ export class BatchExecFlowCall__Inputs {
     return this._call.inputValues[1].value.toBytes();
   }
 
-  get gasLimit(): BigInt {
+  get value2(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
   }
 }
@@ -917,32 +867,32 @@ export class BatchExecFlowCall__Outputs {
   }
 }
 
-export class DestroyFlowCall extends ethereum.Call {
-  get inputs(): DestroyFlowCall__Inputs {
-    return new DestroyFlowCall__Inputs(this);
+export class CloseFlowCall extends ethereum.Call {
+  get inputs(): CloseFlowCall__Inputs {
+    return new CloseFlowCall__Inputs(this);
   }
 
-  get outputs(): DestroyFlowCall__Outputs {
-    return new DestroyFlowCall__Outputs(this);
+  get outputs(): CloseFlowCall__Outputs {
+    return new CloseFlowCall__Outputs(this);
   }
 }
 
-export class DestroyFlowCall__Inputs {
-  _call: DestroyFlowCall;
+export class CloseFlowCall__Inputs {
+  _call: CloseFlowCall;
 
-  constructor(call: DestroyFlowCall) {
+  constructor(call: CloseFlowCall) {
     this._call = call;
   }
 
-  get _flowId(): BigInt {
+  get flowId(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
 }
 
-export class DestroyFlowCall__Outputs {
-  _call: DestroyFlowCall;
+export class CloseFlowCall__Outputs {
+  _call: CloseFlowCall;
 
-  constructor(call: DestroyFlowCall) {
+  constructor(call: CloseFlowCall) {
     this._call = call;
   }
 }
@@ -985,32 +935,36 @@ export class ExecFlowCall__Outputs {
   }
 }
 
-export class PauseFlowCall extends ethereum.Call {
-  get inputs(): PauseFlowCall__Inputs {
-    return new PauseFlowCall__Inputs(this);
+export class InitializeCall extends ethereum.Call {
+  get inputs(): InitializeCall__Inputs {
+    return new InitializeCall__Inputs(this);
   }
 
-  get outputs(): PauseFlowCall__Outputs {
-    return new PauseFlowCall__Outputs(this);
+  get outputs(): InitializeCall__Outputs {
+    return new InitializeCall__Outputs(this);
   }
 }
 
-export class PauseFlowCall__Inputs {
-  _call: PauseFlowCall;
+export class InitializeCall__Inputs {
+  _call: InitializeCall;
 
-  constructor(call: PauseFlowCall) {
+  constructor(call: InitializeCall) {
     this._call = call;
   }
 
-  get _flowId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
+  get _config(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _evaSafesFactory(): Address {
+    return this._call.inputValues[1].value.toAddress();
   }
 }
 
-export class PauseFlowCall__Outputs {
-  _call: PauseFlowCall;
+export class InitializeCall__Outputs {
+  _call: InitializeCall;
 
-  constructor(call: PauseFlowCall) {
+  constructor(call: InitializeCall) {
     this._call = call;
   }
 }
@@ -1087,6 +1041,40 @@ export class RenounceOwnershipCall__Outputs {
   }
 }
 
+export class SetFlowOperatorsCall extends ethereum.Call {
+  get inputs(): SetFlowOperatorsCall__Inputs {
+    return new SetFlowOperatorsCall__Inputs(this);
+  }
+
+  get outputs(): SetFlowOperatorsCall__Outputs {
+    return new SetFlowOperatorsCall__Outputs(this);
+  }
+}
+
+export class SetFlowOperatorsCall__Inputs {
+  _call: SetFlowOperatorsCall;
+
+  constructor(call: SetFlowOperatorsCall) {
+    this._call = call;
+  }
+
+  get op(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get isAdd(): boolean {
+    return this._call.inputValues[1].value.toBoolean();
+  }
+}
+
+export class SetFlowOperatorsCall__Outputs {
+  _call: SetFlowOperatorsCall;
+
+  constructor(call: SetFlowOperatorsCall) {
+    this._call = call;
+  }
+}
+
 export class SetMinConfigCall extends ethereum.Call {
   get inputs(): SetMinConfigCall__Inputs {
     return new SetMinConfigCall__Inputs(this);
@@ -1142,36 +1130,6 @@ export class SetMinConfigCall_minConfigStruct extends ethereum.Tuple {
 
   get blockCountPerTurn(): i32 {
     return this[5].toI32();
-  }
-}
-
-export class StartFlowCall extends ethereum.Call {
-  get inputs(): StartFlowCall__Inputs {
-    return new StartFlowCall__Inputs(this);
-  }
-
-  get outputs(): StartFlowCall__Outputs {
-    return new StartFlowCall__Outputs(this);
-  }
-}
-
-export class StartFlowCall__Inputs {
-  _call: StartFlowCall;
-
-  constructor(call: StartFlowCall) {
-    this._call = call;
-  }
-
-  get _flowId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class StartFlowCall__Outputs {
-  _call: StartFlowCall;
-
-  constructor(call: StartFlowCall) {
-    this._call = call;
   }
 }
 

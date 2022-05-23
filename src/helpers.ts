@@ -5,7 +5,7 @@ import { FlowEntity, FlowHistory } from "../generated/schema"
 
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-export const EVAFLOW_CONTROLLER_ADDRESS = '0x9E70EF1b4c8D332d76b5e53D4088C43A989466e9'
+export const EVAFLOW_CONTROLLER_ADDRESS = '0xd4a2660d53F757f91E730Db3727cD24E57106f47'
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -14,10 +14,9 @@ export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 export let CREATE = '1'
 export let UPGRADE = '2'
-export let EXECUTE= '3'
-export let PAUSE = '4'
-export let DESTROY= '5'
-export let RESTART = '6'
+export let SUCCESS = '3'
+export let FAILED = '4'
+export let CLOSED = '5'
 // export let START = '3'
 // export let SUCCESS = '5'
 // export let FAILED = '6'
@@ -40,7 +39,6 @@ export enum FlowFunction {
   FlowPaused,
   FlowStart,
   FlowUpdated,
-
 }
 
 export function bigDecimalExp18(): BigDecimal {
@@ -129,17 +127,22 @@ export function updateFlow(flow: FlowEntity, funType: FlowFunction): void {
 
 }
 
-export function saveFlowHistory(flowHistory: FlowHistory, event: ethereum.Event, fee: BigInt, action: string, ethGasFee: BigInt, evaGasFee: BigInt): void {
-
-  flowHistory.blockTime = event.block.timestamp
+export function saveFlowHistory(flowHistory: FlowHistory,
+  event: ethereum.Event,
+  fee: BigInt,
+  action: string,
+  ethGasFee: BigInt,
+  evaGasFee: BigInt,
+  flowId: string
+  ): void {
   flowHistory.gasUsed = fee
+  flowHistory.blockTime = event.block.timestamp
   flowHistory.action = action
   flowHistory.from = event.transaction.from.toHexString()
   flowHistory.ethGasFee = ethGasFee
   flowHistory.evaGasFee = evaGasFee
-  
+  flowHistory.flowId = flowId
   flowHistory.save()
-
 }
 
 export function paraOrderInput(input: Bytes, flowHistory: FlowHistory): void {
