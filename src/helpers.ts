@@ -99,42 +99,42 @@ export let CLOSED = '5'
 //   return result.flowName
 // }
 
-// export function updateFlow(flow: FlowEntity, funType: FlowFunction): void {
-//   // static definitions overrides
+export function updateFlow(flow: FlowEntity, funType: FlowFunction): void {
+  // static definitions overrides
 
-//   let contract = NftLimitOrderFlowProxy.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
+  let contract = NftLimitOrderFlowProxy.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
 
-//   // try types string and bytes32 for symbol
-//   // let result = contract.getFlowMetas(BigInt.fromString(flow.id))
-//   // if (result) {
-//   //   if (funType == FlowFunction.FlowDestroyed ||
-//   //     funType == FlowFunction.FlowPaused ||
-//   //     funType == FlowFunction.FlowStart) {
-//   //     if (result.flowStatus > 1) {
-//   //       flow.flowStatus = 2
-//   //     } else {
-//   //       flow.flowStatus = result.flowStatus
-//   //     }
-//   //     flow.lastExecNumber = result.lastExecNumber
-//   //   }
-//   //   if (
-//   //     funType == FlowFunction.FlowUpdated) {
-//   //     flow.flowName = result.flowName
-//   //     flow.lastVersionflow = result.lastVersionflow.toHexString()
+  // try types string and bytes32 for symbol
+  let result = contract.getFlowMetas(BigInt.fromString(flow.id))
+  if (result) {
+    if (funType == FlowFunction.FlowDestroyed ||
+      funType == FlowFunction.FlowPaused ||
+      funType == FlowFunction.FlowStart) {
+      if (result.flowStatus > 1) {
+        flow.flowStatus = 2
+      } else {
+        flow.flowStatus = result.flowStatus
+      }
+      flow.lastExecNumber = result.lastExecNumber
+    }
+    if (
+      funType == FlowFunction.FlowUpdated) {
+      flow.flowName = result.flowName
+      flow.lastVersionflow = result.lastVersionflow.toHexString()
 
-//   //   }
+    }
 
-//   //   if (funType == FlowFunction.FlowExecuteFailed ||
-//   //     funType == FlowFunction.FlowExecuteSuccess ||
-//   //     funType == FlowFunction.FlowUpdated) {
-//   //     flow.lastKeeper = result.lastKeeper.toHexString()
-//   //     flow.lastExecNumber = result.lastExecNumber
-//   //   }
+    if (funType == FlowFunction.FlowExecuteFailed ||
+      funType == FlowFunction.FlowExecuteSuccess ||
+      funType == FlowFunction.FlowUpdated) {
+      flow.lastKeeper = result.lastKeeper.toHexString()
+      flow.lastExecNumber = result.lastExecNumber
+    }
 
-//     flow.save()
-//   }
+    flow.save()
+  }
 
-// }
+}
 
 export function saveFlowHistory(flowHistory: FlowHistory,
   event: ethereum.Event,
@@ -142,7 +142,6 @@ export function saveFlowHistory(flowHistory: FlowHistory,
   action: string,
   ethGasFee: BigInt,
   evaGasFee: BigInt,
-  content: string,
   flowId: string
 ): void {
   flowHistory.gasUsed = fee

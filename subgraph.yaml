@@ -8,7 +8,7 @@ dataSources:
     source:
       address: '0x538349D0B6488d71Ca798427D0395b52fe861Fc0'
       abi: LOBExchange
-      startBlock: 10712537 
+      startBlock: 10732474 
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -32,7 +32,7 @@ dataSources:
         - event: StrategyChanged(address)
           handler: handleStrategyChanged
       file: ./src/lobmapping.ts
-      
+
   - kind: ethereum
     name: EvaFlowController
     network: rinkeby
@@ -96,7 +96,7 @@ dataSources:
     source:
       address: '0x3e235E74BE64FaE98A2CA18E6fe72Dc562541AfC'
       abi: OpsFlowProxy
-      startBlock: 10712537 
+      startBlock: 10724886
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

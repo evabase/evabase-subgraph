@@ -9,7 +9,7 @@ type FlowEntity @entity {
 #  maxVaildBlockNumber: BigInt
   flowName: String
   input: Bytes
-  gas: BigInt
+  gasFees: BigInt
   nftOrder: NftOrder
   erc20Order: Erc20Order
   taskOrder: TaskOrder

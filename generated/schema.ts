@@ -111,8 +111,8 @@ export class FlowEntity extends Entity {
     }
   }
 
-  get gas(): BigInt | null {
-    let value = this.get("gas");
+  get gasFees(): BigInt | null {
+    let value = this.get("gasFees");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -120,11 +120,11 @@ export class FlowEntity extends Entity {
     }
   }
 
-  set gas(value: BigInt | null) {
+  set gasFees(value: BigInt | null) {
     if (!value) {
-      this.unset("gas");
+      this.unset("gasFees");
     } else {
-      this.set("gas", Value.fromBigInt(<BigInt>value));
+      this.set("gasFees", Value.fromBigInt(<BigInt>value));
     }
   }
 
