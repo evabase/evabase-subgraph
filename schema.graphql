@@ -1,17 +1,19 @@
 type FlowEntity @entity {
   id: ID!
-  flowStatus: Int!
-  keepNetWork: Int!
-  admin: String!
-  lastKeeper: String
-  lastVersionflow: String
-  lastExecNumber: BigInt
-  maxVaildBlockNumber: BigInt
-  flowName: String!
+  flowStatus: Int
+  flowType: Int
+  admin: String
+#  lastKeeper: String
+#  lastVersionflow: String
+#  lastExecNumber: BigInt
+#  maxVaildBlockNumber: BigInt
+  flowName: String
   input: Bytes
-  NftOrder: NftOrder
+  gas: BigInt
+  nftOrder: NftOrder
   erc20Order: Erc20Order
-  details: [FlowHistory!]!
+  taskOrder: TaskOrder
+  details: [FlowHistory!]
 }
 
 type FlowHistory @entity(immutable: true) {
@@ -24,6 +26,7 @@ type FlowHistory @entity(immutable: true) {
   from: String
   ethGasFee: BigInt
   evaGasFee: BigInt
+  content: String
   success: Boolean
   failedReason: String
 }
@@ -36,7 +39,7 @@ type NftOrder @entity {
   price: BigInt #NFT价格
   deadline: BigInt #订单过期时间 s
   tokenId: BigInt
-  salt: BigInt #随机数
+  blockTIme: BigInt
 }
 
 type Erc20Order @entity {
@@ -46,7 +49,18 @@ type Erc20Order @entity {
   inputToken: String!
   minRate: BigInt!
   outputToken: String!
-  expiration: BigInt!
+  deadline: BigInt!
   receiptor: String!
   minInputPer: BigInt!
+}
+
+type TaskOrder @entity{
+  id: ID!
+  owner: String!
+  input: [Bytes!]
+  startTime: BigInt!
+  deadline: BigInt!
+  lastExecTime: BigInt!
+  interval: BigInt!
+  blockTIme: BigInt!
 }

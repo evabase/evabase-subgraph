@@ -51,26 +51,17 @@ export class FlowEntity extends Entity {
     this.set("flowStatus", Value.fromI32(value));
   }
 
-  get keepNetWork(): i32 {
-    let value = this.get("keepNetWork");
+  get flowType(): i32 {
+    let value = this.get("flowType");
     return value!.toI32();
   }
 
-  set keepNetWork(value: i32) {
-    this.set("keepNetWork", Value.fromI32(value));
+  set flowType(value: i32) {
+    this.set("flowType", Value.fromI32(value));
   }
 
-  get admin(): string {
+  get admin(): string | null {
     let value = this.get("admin");
-    return value!.toString();
-  }
-
-  set admin(value: string) {
-    this.set("admin", Value.fromString(value));
-  }
-
-  get lastKeeper(): string | null {
-    let value = this.get("lastKeeper");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -78,72 +69,29 @@ export class FlowEntity extends Entity {
     }
   }
 
-  set lastKeeper(value: string | null) {
+  set admin(value: string | null) {
     if (!value) {
-      this.unset("lastKeeper");
+      this.unset("admin");
     } else {
-      this.set("lastKeeper", Value.fromString(<string>value));
+      this.set("admin", Value.fromString(<string>value));
     }
   }
 
-  get lastVersionflow(): string | null {
-    let value = this.get("lastVersionflow");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set lastVersionflow(value: string | null) {
-    if (!value) {
-      this.unset("lastVersionflow");
-    } else {
-      this.set("lastVersionflow", Value.fromString(<string>value));
-    }
-  }
-
-  get lastExecNumber(): BigInt | null {
-    let value = this.get("lastExecNumber");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set lastExecNumber(value: BigInt | null) {
-    if (!value) {
-      this.unset("lastExecNumber");
-    } else {
-      this.set("lastExecNumber", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get maxVaildBlockNumber(): BigInt | null {
-    let value = this.get("maxVaildBlockNumber");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set maxVaildBlockNumber(value: BigInt | null) {
-    if (!value) {
-      this.unset("maxVaildBlockNumber");
-    } else {
-      this.set("maxVaildBlockNumber", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
-  get flowName(): string {
+  get flowName(): string | null {
     let value = this.get("flowName");
-    return value!.toString();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set flowName(value: string) {
-    this.set("flowName", Value.fromString(value));
+  set flowName(value: string | null) {
+    if (!value) {
+      this.unset("flowName");
+    } else {
+      this.set("flowName", Value.fromString(<string>value));
+    }
   }
 
   get input(): Bytes | null {
@@ -163,8 +111,25 @@ export class FlowEntity extends Entity {
     }
   }
 
-  get NftOrder(): string | null {
-    let value = this.get("NftOrder");
+  get gas(): BigInt | null {
+    let value = this.get("gas");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set gas(value: BigInt | null) {
+    if (!value) {
+      this.unset("gas");
+    } else {
+      this.set("gas", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get nftOrder(): string | null {
+    let value = this.get("nftOrder");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -172,11 +137,11 @@ export class FlowEntity extends Entity {
     }
   }
 
-  set NftOrder(value: string | null) {
+  set nftOrder(value: string | null) {
     if (!value) {
-      this.unset("NftOrder");
+      this.unset("nftOrder");
     } else {
-      this.set("NftOrder", Value.fromString(<string>value));
+      this.set("nftOrder", Value.fromString(<string>value));
     }
   }
 
@@ -197,13 +162,38 @@ export class FlowEntity extends Entity {
     }
   }
 
-  get details(): Array<string> {
-    let value = this.get("details");
-    return value!.toStringArray();
+  get taskOrder(): string | null {
+    let value = this.get("taskOrder");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set details(value: Array<string>) {
-    this.set("details", Value.fromStringArray(value));
+  set taskOrder(value: string | null) {
+    if (!value) {
+      this.unset("taskOrder");
+    } else {
+      this.set("taskOrder", Value.fromString(<string>value));
+    }
+  }
+
+  get details(): Array<string> | null {
+    let value = this.get("details");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toStringArray();
+    }
+  }
+
+  set details(value: Array<string> | null) {
+    if (!value) {
+      this.unset("details");
+    } else {
+      this.set("details", Value.fromStringArray(<Array<string>>value));
+    }
   }
 }
 
@@ -354,6 +344,23 @@ export class FlowHistory extends Entity {
       this.unset("evaGasFee");
     } else {
       this.set("evaGasFee", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get content(): string | null {
+    let value = this.get("content");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set content(value: string | null) {
+    if (!value) {
+      this.unset("content");
+    } else {
+      this.set("content", Value.fromString(<string>value));
     }
   }
 
@@ -517,8 +524,8 @@ export class NftOrder extends Entity {
     }
   }
 
-  get salt(): BigInt | null {
-    let value = this.get("salt");
+  get blockTIme(): BigInt | null {
+    let value = this.get("blockTIme");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -526,11 +533,11 @@ export class NftOrder extends Entity {
     }
   }
 
-  set salt(value: BigInt | null) {
+  set blockTIme(value: BigInt | null) {
     if (!value) {
-      this.unset("salt");
+      this.unset("blockTIme");
     } else {
-      this.set("salt", Value.fromBigInt(<BigInt>value));
+      this.set("blockTIme", Value.fromBigInt(<BigInt>value));
     }
   }
 }
@@ -611,13 +618,13 @@ export class Erc20Order extends Entity {
     this.set("outputToken", Value.fromString(value));
   }
 
-  get expiration(): BigInt {
-    let value = this.get("expiration");
+  get deadline(): BigInt {
+    let value = this.get("deadline");
     return value!.toBigInt();
   }
 
-  set expiration(value: BigInt) {
-    this.set("expiration", Value.fromBigInt(value));
+  set deadline(value: BigInt) {
+    this.set("deadline", Value.fromBigInt(value));
   }
 
   get receiptor(): string {
@@ -636,5 +643,108 @@ export class Erc20Order extends Entity {
 
   set minInputPer(value: BigInt) {
     this.set("minInputPer", Value.fromBigInt(value));
+  }
+}
+
+export class TaskOrder extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save TaskOrder entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type TaskOrder must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`
+      );
+      store.set("TaskOrder", id.toString(), this);
+    }
+  }
+
+  static load(id: string): TaskOrder | null {
+    return changetype<TaskOrder | null>(store.get("TaskOrder", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get owner(): string {
+    let value = this.get("owner");
+    return value!.toString();
+  }
+
+  set owner(value: string) {
+    this.set("owner", Value.fromString(value));
+  }
+
+  get input(): Array<Bytes> | null {
+    let value = this.get("input");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytesArray();
+    }
+  }
+
+  set input(value: Array<Bytes> | null) {
+    if (!value) {
+      this.unset("input");
+    } else {
+      this.set("input", Value.fromBytesArray(<Array<Bytes>>value));
+    }
+  }
+
+  get startTime(): BigInt {
+    let value = this.get("startTime");
+    return value!.toBigInt();
+  }
+
+  set startTime(value: BigInt) {
+    this.set("startTime", Value.fromBigInt(value));
+  }
+
+  get deadline(): BigInt {
+    let value = this.get("deadline");
+    return value!.toBigInt();
+  }
+
+  set deadline(value: BigInt) {
+    this.set("deadline", Value.fromBigInt(value));
+  }
+
+  get lastExecTime(): BigInt {
+    let value = this.get("lastExecTime");
+    return value!.toBigInt();
+  }
+
+  set lastExecTime(value: BigInt) {
+    this.set("lastExecTime", Value.fromBigInt(value));
+  }
+
+  get interval(): BigInt {
+    let value = this.get("interval");
+    return value!.toBigInt();
+  }
+
+  set interval(value: BigInt) {
+    this.set("interval", Value.fromBigInt(value));
+  }
+
+  get blockTIme(): BigInt {
+    let value = this.get("blockTIme");
+    return value!.toBigInt();
+  }
+
+  set blockTIme(value: BigInt) {
+    this.set("blockTIme", Value.fromBigInt(value));
   }
 }

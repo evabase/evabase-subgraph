@@ -10,116 +10,6 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
-export class OrderCancelled extends ethereum.Event {
-  get params(): OrderCancelled__Params {
-    return new OrderCancelled__Params(this);
-  }
-}
-
-export class OrderCancelled__Params {
-  _event: OrderCancelled;
-
-  constructor(event: OrderCancelled) {
-    this._event = event;
-  }
-
-  get user(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get orderId(): Bytes {
-    return this._event.parameters[1].value.toBytes();
-  }
-}
-
-export class OrderCreated extends ethereum.Event {
-  get params(): OrderCreated__Params {
-    return new OrderCreated__Params(this);
-  }
-}
-
-export class OrderCreated__Params {
-  _event: OrderCreated;
-
-  constructor(event: OrderCreated) {
-    this._event = event;
-  }
-
-  get user(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get flowId(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
-  }
-
-  get order(): OrderCreatedOrderStruct {
-    return changetype<OrderCreatedOrderStruct>(
-      this._event.parameters[2].value.toTuple()
-    );
-  }
-}
-
-export class OrderCreatedOrderStruct extends ethereum.Tuple {
-  get owner(): Address {
-    return this[0].toAddress();
-  }
-
-  get assetToken(): Address {
-    return this[1].toAddress();
-  }
-
-  get amount(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get price(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get deadline(): BigInt {
-    return this[4].toBigInt();
-  }
-
-  get tokenId(): BigInt {
-    return this[5].toBigInt();
-  }
-
-  get salt(): BigInt {
-    return this[6].toBigInt();
-  }
-}
-
-export class OrderExecuted extends ethereum.Event {
-  get params(): OrderExecuted__Params {
-    return new OrderExecuted__Params(this);
-  }
-}
-
-export class OrderExecuted__Params {
-  _event: OrderExecuted;
-
-  constructor(event: OrderExecuted) {
-    this._event = event;
-  }
-
-  get user(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get orderId(): Bytes {
-    return this._event.parameters[1].value.toBytes();
-  }
-
-  get amount(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-
-  get value(): BigInt {
-    return this._event.parameters[3].value.toBigInt();
-  }
-}
-
 export class OwnershipTransferred extends ethereum.Event {
   get params(): OwnershipTransferred__Params {
     return new OwnershipTransferred__Params(this);
@@ -142,7 +32,101 @@ export class OwnershipTransferred__Params {
   }
 }
 
-export class NftLimitOrderFlowProxy__checkResult {
+export class TaskCancelled extends ethereum.Event {
+  get params(): TaskCancelled__Params {
+    return new TaskCancelled__Params(this);
+  }
+}
+
+export class TaskCancelled__Params {
+  _event: TaskCancelled;
+
+  constructor(event: TaskCancelled) {
+    this._event = event;
+  }
+
+  get user(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get taskId(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+}
+
+export class TaskCreated extends ethereum.Event {
+  get params(): TaskCreated__Params {
+    return new TaskCreated__Params(this);
+  }
+}
+
+export class TaskCreated__Params {
+  _event: TaskCreated;
+
+  constructor(event: TaskCreated) {
+    this._event = event;
+  }
+
+  get user(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get flowId(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get task(): TaskCreatedTaskStruct {
+    return changetype<TaskCreatedTaskStruct>(
+      this._event.parameters[2].value.toTuple()
+    );
+  }
+}
+
+export class TaskCreatedTaskStruct extends ethereum.Tuple {
+  get owner(): Address {
+    return this[0].toAddress();
+  }
+
+  get inputs(): Array<Bytes> {
+    return this[1].toBytesArray();
+  }
+
+  get startTime(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get deadline(): BigInt {
+    return this[3].toBigInt();
+  }
+
+  get lastExecTime(): BigInt {
+    return this[4].toBigInt();
+  }
+
+  get interval(): BigInt {
+    return this[5].toBigInt();
+  }
+}
+
+export class TaskExecuted extends ethereum.Event {
+  get params(): TaskExecuted__Params {
+    return new TaskExecuted__Params(this);
+  }
+}
+
+export class TaskExecuted__Params {
+  _event: TaskExecuted;
+
+  constructor(event: TaskExecuted) {
+    this._event = event;
+  }
+
+  get taskId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
+export class OpsFlowProxy__checkResult {
   value0: boolean;
   value1: Bytes;
 
@@ -159,123 +143,72 @@ export class NftLimitOrderFlowProxy__checkResult {
   }
 }
 
-export class NftLimitOrderFlowProxy__hashOrderInputOrderStruct extends ethereum.Tuple {
+export class OpsFlowProxy__getSubCallsResultSubsStruct extends ethereum.Tuple {
+  get target(): Address {
+    return this[0].toAddress();
+  }
+
+  get valueETH(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get data(): Bytes {
+    return this[2].toBytes();
+  }
+}
+
+export class OpsFlowProxy__getTaskResultTaskStruct extends ethereum.Tuple {
   get owner(): Address {
     return this[0].toAddress();
   }
 
-  get assetToken(): Address {
-    return this[1].toAddress();
+  get inputs(): Array<Bytes> {
+    return this[1].toBytesArray();
   }
 
-  get amount(): BigInt {
+  get startTime(): BigInt {
     return this[2].toBigInt();
   }
 
-  get price(): BigInt {
+  get deadline(): BigInt {
     return this[3].toBigInt();
   }
 
-  get deadline(): BigInt {
+  get lastExecTime(): BigInt {
     return this[4].toBigInt();
   }
 
-  get tokenId(): BigInt {
+  get interval(): BigInt {
     return this[5].toBigInt();
   }
-
-  get salt(): BigInt {
-    return this[6].toBigInt();
-  }
 }
 
-export class NftLimitOrderFlowProxy__orderExistsResult {
-  value0: Address;
-  value1: BigInt;
-  value2: i32;
-  value3: BigInt;
-
-  constructor(value0: Address, value1: BigInt, value2: i32, value3: BigInt) {
-    this.value0 = value0;
-    this.value1 = value1;
-    this.value2 = value2;
-    this.value3 = value3;
+export class OpsFlowProxy extends ethereum.SmartContract {
+  static bind(address: Address): OpsFlowProxy {
+    return new OpsFlowProxy("OpsFlowProxy", address);
   }
 
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromAddress(this.value0));
-    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
-    map.set(
-      "value2",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value2))
-    );
-    map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
-    return map;
-  }
-}
-
-export class NftLimitOrderFlowProxy__verifyOrderInputOrderStruct extends ethereum.Tuple {
-  get owner(): Address {
-    return this[0].toAddress();
-  }
-
-  get assetToken(): Address {
-    return this[1].toAddress();
-  }
-
-  get amount(): BigInt {
-    return this[2].toBigInt();
-  }
-
-  get price(): BigInt {
-    return this[3].toBigInt();
-  }
-
-  get deadline(): BigInt {
-    return this[4].toBigInt();
-  }
-
-  get tokenId(): BigInt {
-    return this[5].toBigInt();
-  }
-
-  get salt(): BigInt {
-    return this[6].toBigInt();
-  }
-}
-
-export class NftLimitOrderFlowProxy extends ethereum.SmartContract {
-  static bind(address: Address): NftLimitOrderFlowProxy {
-    return new NftLimitOrderFlowProxy("NftLimitOrderFlowProxy", address);
-  }
-
-  check(param0: Bytes): NftLimitOrderFlowProxy__checkResult {
+  check(taskIdData: Bytes): OpsFlowProxy__checkResult {
     let result = super.call("check", "check(bytes):(bool,bytes)", [
-      ethereum.Value.fromBytes(param0)
+      ethereum.Value.fromBytes(taskIdData)
     ]);
 
-    return new NftLimitOrderFlowProxy__checkResult(
+    return new OpsFlowProxy__checkResult(
       result[0].toBoolean(),
       result[1].toBytes()
     );
   }
 
-  try_check(
-    param0: Bytes
-  ): ethereum.CallResult<NftLimitOrderFlowProxy__checkResult> {
+  try_check(taskIdData: Bytes): ethereum.CallResult<OpsFlowProxy__checkResult> {
     let result = super.tryCall("check", "check(bytes):(bool,bytes)", [
-      ethereum.Value.fromBytes(param0)
+      ethereum.Value.fromBytes(taskIdData)
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new NftLimitOrderFlowProxy__checkResult(
-        value[0].toBoolean(),
-        value[1].toBytes()
-      )
+      new OpsFlowProxy__checkResult(value[0].toBoolean(), value[1].toBytes())
     );
   }
 
@@ -336,42 +269,75 @@ export class NftLimitOrderFlowProxy extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  hashOrder(order: NftLimitOrderFlowProxy__hashOrderInputOrderStruct): Bytes {
+  getSubCalls(
+    executeData: Bytes
+  ): Array<OpsFlowProxy__getSubCallsResultSubsStruct> {
     let result = super.call(
-      "hashOrder",
-      "hashOrder((address,address,uint256,uint256,uint256,uint256,uint256)):(bytes32)",
-      [ethereum.Value.fromTuple(order)]
+      "getSubCalls",
+      "getSubCalls(bytes):((address,uint120,bytes)[])",
+      [ethereum.Value.fromBytes(executeData)]
     );
 
-    return result[0].toBytes();
+    return result[0].toTupleArray<OpsFlowProxy__getSubCallsResultSubsStruct>();
   }
 
-  try_hashOrder(
-    order: NftLimitOrderFlowProxy__hashOrderInputOrderStruct
-  ): ethereum.CallResult<Bytes> {
+  try_getSubCalls(
+    executeData: Bytes
+  ): ethereum.CallResult<Array<OpsFlowProxy__getSubCallsResultSubsStruct>> {
     let result = super.tryCall(
-      "hashOrder",
-      "hashOrder((address,address,uint256,uint256,uint256,uint256,uint256)):(bytes32)",
-      [ethereum.Value.fromTuple(order)]
+      "getSubCalls",
+      "getSubCalls(bytes):((address,uint120,bytes)[])",
+      [ethereum.Value.fromBytes(executeData)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBytes());
+    return ethereum.CallResult.fromValue(
+      value[0].toTupleArray<OpsFlowProxy__getSubCallsResultSubsStruct>()
+    );
   }
 
-  needClose(orderIdData: Bytes): boolean {
-    let result = super.call("needClose", "needClose(bytes):(bool)", [
-      ethereum.Value.fromBytes(orderIdData)
+  getTask(taskId: BigInt): OpsFlowProxy__getTaskResultTaskStruct {
+    let result = super.call(
+      "getTask",
+      "getTask(uint256):((address,bytes[],uint64,uint64,uint64,uint64))",
+      [ethereum.Value.fromUnsignedBigInt(taskId)]
+    );
+
+    return changetype<OpsFlowProxy__getTaskResultTaskStruct>(
+      result[0].toTuple()
+    );
+  }
+
+  try_getTask(
+    taskId: BigInt
+  ): ethereum.CallResult<OpsFlowProxy__getTaskResultTaskStruct> {
+    let result = super.tryCall(
+      "getTask",
+      "getTask(uint256):((address,bytes[],uint64,uint64,uint64,uint64))",
+      [ethereum.Value.fromUnsignedBigInt(taskId)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      changetype<OpsFlowProxy__getTaskResultTaskStruct>(value[0].toTuple())
+    );
+  }
+
+  isActiveTask(taskId: BigInt): boolean {
+    let result = super.call("isActiveTask", "isActiveTask(uint256):(bool)", [
+      ethereum.Value.fromUnsignedBigInt(taskId)
     ]);
 
     return result[0].toBoolean();
   }
 
-  try_needClose(orderIdData: Bytes): ethereum.CallResult<boolean> {
-    let result = super.tryCall("needClose", "needClose(bytes):(bool)", [
-      ethereum.Value.fromBytes(orderIdData)
+  try_isActiveTask(taskId: BigInt): ethereum.CallResult<boolean> {
+    let result = super.tryCall("isActiveTask", "isActiveTask(uint256):(bool)", [
+      ethereum.Value.fromUnsignedBigInt(taskId)
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -380,54 +346,17 @@ export class NftLimitOrderFlowProxy extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  orderExists(param0: Bytes): NftLimitOrderFlowProxy__orderExistsResult {
-    let result = super.call(
-      "orderExists",
-      "orderExists(bytes32):(address,uint96,uint8,uint64)",
-      [ethereum.Value.fromFixedBytes(param0)]
-    );
-
-    return new NftLimitOrderFlowProxy__orderExistsResult(
-      result[0].toAddress(),
-      result[1].toBigInt(),
-      result[2].toI32(),
-      result[3].toBigInt()
-    );
-  }
-
-  try_orderExists(
-    param0: Bytes
-  ): ethereum.CallResult<NftLimitOrderFlowProxy__orderExistsResult> {
-    let result = super.tryCall(
-      "orderExists",
-      "orderExists(bytes32):(address,uint96,uint8,uint64)",
-      [ethereum.Value.fromFixedBytes(param0)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(
-      new NftLimitOrderFlowProxy__orderExistsResult(
-        value[0].toAddress(),
-        value[1].toBigInt(),
-        value[2].toI32(),
-        value[3].toBigInt()
-      )
-    );
-  }
-
-  orderExpired(orderId: Bytes): boolean {
-    let result = super.call("orderExpired", "orderExpired(bytes32):(bool)", [
-      ethereum.Value.fromFixedBytes(orderId)
+  needClose(taskIdData: Bytes): boolean {
+    let result = super.call("needClose", "needClose(bytes):(bool)", [
+      ethereum.Value.fromBytes(taskIdData)
     ]);
 
     return result[0].toBoolean();
   }
 
-  try_orderExpired(orderId: Bytes): ethereum.CallResult<boolean> {
-    let result = super.tryCall("orderExpired", "orderExpired(bytes32):(bool)", [
-      ethereum.Value.fromFixedBytes(orderId)
+  try_needClose(taskIdData: Bytes): ethereum.CallResult<boolean> {
+    let result = super.tryCall("needClose", "needClose(bytes):(bool)", [
+      ethereum.Value.fromBytes(taskIdData)
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -451,28 +380,18 @@ export class NftLimitOrderFlowProxy extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  verifyOrder(
-    order: NftLimitOrderFlowProxy__verifyOrderInputOrderStruct,
-    signature: Bytes
-  ): boolean {
-    let result = super.call(
-      "verifyOrder",
-      "verifyOrder((address,address,uint256,uint256,uint256,uint256,uint256),bytes):(bool)",
-      [ethereum.Value.fromTuple(order), ethereum.Value.fromBytes(signature)]
-    );
+  taskExpired(taskId: BigInt): boolean {
+    let result = super.call("taskExpired", "taskExpired(uint256):(bool)", [
+      ethereum.Value.fromUnsignedBigInt(taskId)
+    ]);
 
     return result[0].toBoolean();
   }
 
-  try_verifyOrder(
-    order: NftLimitOrderFlowProxy__verifyOrderInputOrderStruct,
-    signature: Bytes
-  ): ethereum.CallResult<boolean> {
-    let result = super.tryCall(
-      "verifyOrder",
-      "verifyOrder((address,address,uint256,uint256,uint256,uint256,uint256),bytes):(bool)",
-      [ethereum.Value.fromTuple(order), ethereum.Value.fromBytes(signature)]
-    );
+  try_taskExpired(taskId: BigInt): ethereum.CallResult<boolean> {
+    let result = super.tryCall("taskExpired", "taskExpired(uint256):(bool)", [
+      ethereum.Value.fromUnsignedBigInt(taskId)
+    ]);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -505,14 +424,6 @@ export class ConstructorCall__Inputs {
   get _evaSafesFactory(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
-
-  get name(): string {
-    return this._call.inputValues[2].value.toString();
-  }
-
-  get version(): string {
-    return this._call.inputValues[3].value.toString();
-  }
 }
 
 export class ConstructorCall__Outputs {
@@ -523,32 +434,32 @@ export class ConstructorCall__Outputs {
   }
 }
 
-export class CancelOrderCall extends ethereum.Call {
-  get inputs(): CancelOrderCall__Inputs {
-    return new CancelOrderCall__Inputs(this);
+export class CancelTaskCall extends ethereum.Call {
+  get inputs(): CancelTaskCall__Inputs {
+    return new CancelTaskCall__Inputs(this);
   }
 
-  get outputs(): CancelOrderCall__Outputs {
-    return new CancelOrderCall__Outputs(this);
+  get outputs(): CancelTaskCall__Outputs {
+    return new CancelTaskCall__Outputs(this);
   }
 }
 
-export class CancelOrderCall__Inputs {
-  _call: CancelOrderCall;
+export class CancelTaskCall__Inputs {
+  _call: CancelTaskCall;
 
-  constructor(call: CancelOrderCall) {
+  constructor(call: CancelTaskCall) {
     this._call = call;
   }
 
-  get orderId(): Bytes {
-    return this._call.inputValues[0].value.toBytes();
+  get taskId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
   }
 }
 
-export class CancelOrderCall__Outputs {
-  _call: CancelOrderCall;
+export class CancelTaskCall__Outputs {
+  _call: CancelTaskCall;
 
-  constructor(call: CancelOrderCall) {
+  constructor(call: CancelTaskCall) {
     this._call = call;
   }
 }
@@ -570,7 +481,7 @@ export class CloseCall__Inputs {
     this._call = call;
   }
 
-  get orderIdData(): Bytes {
+  get taskIdData(): Bytes {
     return this._call.inputValues[0].value.toBytes();
   }
 }
@@ -638,7 +549,7 @@ export class CreateCall__Inputs {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get nftLimitOrder(): Address {
+  get opsFlow(): Address {
     return this._call.inputValues[1].value.toAddress();
   }
 
@@ -654,8 +565,8 @@ export class CreateCall__Inputs {
     return this._call.inputValues[4].value.toString();
   }
 
-  get order(): CreateCallOrderStruct {
-    return changetype<CreateCallOrderStruct>(
+  get task(): CreateCallTaskStruct {
+    return changetype<CreateCallTaskStruct>(
       this._call.inputValues[5].value.toTuple()
     );
   }
@@ -669,103 +580,95 @@ export class CreateCall__Outputs {
   }
 }
 
-export class CreateCallOrderStruct extends ethereum.Tuple {
+export class CreateCallTaskStruct extends ethereum.Tuple {
   get owner(): Address {
     return this[0].toAddress();
   }
 
-  get assetToken(): Address {
-    return this[1].toAddress();
+  get inputs(): Array<Bytes> {
+    return this[1].toBytesArray();
   }
 
-  get amount(): BigInt {
+  get startTime(): BigInt {
     return this[2].toBigInt();
   }
 
-  get price(): BigInt {
+  get deadline(): BigInt {
     return this[3].toBigInt();
   }
 
-  get deadline(): BigInt {
+  get lastExecTime(): BigInt {
     return this[4].toBigInt();
   }
 
-  get tokenId(): BigInt {
+  get interval(): BigInt {
     return this[5].toBigInt();
   }
+}
 
-  get salt(): BigInt {
-    return this[6].toBigInt();
+export class CreateTaskCall extends ethereum.Call {
+  get inputs(): CreateTaskCall__Inputs {
+    return new CreateTaskCall__Inputs(this);
+  }
+
+  get outputs(): CreateTaskCall__Outputs {
+    return new CreateTaskCall__Outputs(this);
   }
 }
 
-export class CreateOrderCall extends ethereum.Call {
-  get inputs(): CreateOrderCall__Inputs {
-    return new CreateOrderCall__Inputs(this);
-  }
+export class CreateTaskCall__Inputs {
+  _call: CreateTaskCall;
 
-  get outputs(): CreateOrderCall__Outputs {
-    return new CreateOrderCall__Outputs(this);
-  }
-}
-
-export class CreateOrderCall__Inputs {
-  _call: CreateOrderCall;
-
-  constructor(call: CreateOrderCall) {
+  constructor(call: CreateTaskCall) {
     this._call = call;
   }
 
-  get order(): CreateOrderCallOrderStruct {
-    return changetype<CreateOrderCallOrderStruct>(
+  get task(): CreateTaskCallTaskStruct {
+    return changetype<CreateTaskCallTaskStruct>(
       this._call.inputValues[0].value.toTuple()
     );
   }
 
-  get flowId(): BigInt {
+  get taskId(): BigInt {
     return this._call.inputValues[1].value.toBigInt();
   }
 }
 
-export class CreateOrderCall__Outputs {
-  _call: CreateOrderCall;
+export class CreateTaskCall__Outputs {
+  _call: CreateTaskCall;
 
-  constructor(call: CreateOrderCall) {
+  constructor(call: CreateTaskCall) {
     this._call = call;
   }
 
-  get orderId(): Bytes {
+  get _taskId(): Bytes {
     return this._call.outputValues[0].value.toBytes();
   }
 }
 
-export class CreateOrderCallOrderStruct extends ethereum.Tuple {
+export class CreateTaskCallTaskStruct extends ethereum.Tuple {
   get owner(): Address {
     return this[0].toAddress();
   }
 
-  get assetToken(): Address {
-    return this[1].toAddress();
+  get inputs(): Array<Bytes> {
+    return this[1].toBytesArray();
   }
 
-  get amount(): BigInt {
+  get startTime(): BigInt {
     return this[2].toBigInt();
   }
 
-  get price(): BigInt {
+  get deadline(): BigInt {
     return this[3].toBigInt();
   }
 
-  get deadline(): BigInt {
+  get lastExecTime(): BigInt {
     return this[4].toBigInt();
   }
 
-  get tokenId(): BigInt {
+  get interval(): BigInt {
     return this[5].toBigInt();
-  }
-
-  get salt(): BigInt {
-    return this[6].toBigInt();
   }
 }
 

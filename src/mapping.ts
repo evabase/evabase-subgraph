@@ -1,122 +1,59 @@
-import { BigInt ,ethereum} from "@graphprotocol/graph-ts"
+import { log, BigInt, BigDecimal, Address, Bytes, ethereum, ByteArray } from '@graphprotocol/graph-ts'
 import {
-  EvaFlowController,
-  FlowClosed,
-  FlowCreated,
-  FlowExecuteFailed,
-  FlowExecuteSuccess,
-  FlowUpdated,
-  OwnershipTransferred,
-  SetMinConfig
+    EvaFlowController,
+    FlowClosed,
+    FlowCreated,
+    FlowExecuteFailed,
+    FlowExecuteSuccess,
+    FlowOperatorChanged,
+    FlowUpdated,
+    OwnershipTransferred,
+    SetMinConfig
 } from "../generated/EvaFlowController/EvaFlowController"
-import { FlowEntity,FlowHistory } from "../generated/schema"
-import {
-  updateFlow,
-  saveFlow,
-  ZERO_BI,
-  FlowFunction,
-  saveFlowHistory,
-  CREATE,
-  UPGRADE,
-  CLOSED,
-  FAILED,
-  SUCCESS
-} from './helpers'
+import { LOBExchange } from '../generated/LOBExchange/LOBExchange'
+import { Erc20Order, FlowEntity } from "../generated/schema"
+import { EVAFLOW_CONTROLLER_ADDRESS, LOB_EXCHANGE_ADDRESS } from "./helpers"
+
+export function handleFlowClosed(event: FlowClosed): void { }
 
 export function handleFlowCreated(event: FlowCreated): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  // let entity = FlowEntity.load(event.transaction.from.toHex())
-  let flowId= event.params.flowId.toString()
-//   let entity = FlowEntity.load(flowId)
+    let flowId = event.params.flowId.toString()
+    let entity = FlowEntity.load(flowId)
+    if (!entity) {
+        entity = new FlowEntity(flowId)
+    }
+    let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
+    let result = contract.getFlowMetas(BigInt.fromString(flowId))
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  let entity = new FlowEntity(flowId)
-  let createHash = event.transaction.hash.toHexString()
-  let flowHistory =  new FlowHistory(createHash)
-  saveFlowHistory(flowHistory,event,ZERO_BI,CREATE,ZERO_BI,ZERO_BI,flowId)
-  entity.details = [flowHistory.id]
-  // Entity fields can be set based on event parameters
-  entity.admin = event.params.user.toHexString()
-  entity.input = event.transaction.input
-  saveFlow(entity)
+   
+    let checkData = event.params.checkData
+    entity.input = checkData
 
+    let lobContract = LOBExchange.bind(Address.fromString(LOB_EXCHANGE_ADDRESS))
+    let orderInfo = lobContract.try_getOrderInfo(Bytes.fromHexString(checkData.toHexString().slice(2)))
+    if (orderInfo.value) {
+        entity.flowType = 2 // erc20 is 2
+        let erc20Order = new Erc20Order(flowId)
+        erc20Order.owner = orderInfo.value.value0.owner.toHexString()
+        erc20Order.inputAmount = orderInfo.value.value0.inputAmount
+        erc20Order.inputToken = orderInfo.value.value0.inputToken.toHexString()
+        erc20Order.minRate = orderInfo.value.value0.minRate
+        erc20Order.outputToken = orderInfo.value.value0.outputToken.toHexString()
+        erc20Order.deadline = orderInfo.value.value0.deadline
+        erc20Order.receiptor = orderInfo.value.value0.receiptor.toHexString()
+        erc20Order.minInputPer = orderInfo.value.value0.minInputPer
+        erc20Order.save
+        entity.erc20Order = erc20Order.id
+
+    }
+
+
+    entity.flowName = result.flowName
+    entity.flowStatus = 0
+    entity.admin = event.params.user.toHexString()
+    entity.save()
 }
 
-export function handleFlowClosed(event: FlowClosed): void {
-  let flowId= event.params.flowId.toString()
-  let entity = FlowEntity.load(flowId)
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity) {
-    let flowHistoryId = event.transaction.hash.toHexString()
-    let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI,CLOSED,ZERO_BI,ZERO_BI,flowId)
-    let newdetails = entity.details
-    newdetails.push(flowHistory.id)
-    entity.details = newdetails
-    updateFlow(entity,FlowFunction.FlowDestroyed)
-  }
-}
-
-export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
-  let flowId= event.params.flowId.toString()
-  let entity = FlowEntity.load(flowId)
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity) {
-    let flowHistoryId = event.transaction.hash.toHexString()
-    let flowHistory = new FlowHistory(flowHistoryId)
-    flowHistory.success = false
-    flowHistory.failedReason = event.params.reason
-    saveFlowHistory(flowHistory,event,event.params.gasUsed,FAILED,event.params.payAmountByETH,event.params.payAmountByFeeToken,flowId)
-    let newdetails = entity.details
-    newdetails.push(flowHistory.id)
-    entity.details = newdetails
-    updateFlow(entity,FlowFunction.FlowExecuteFailed)
-  }
-}
-
-export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void {
-
-  let flowId= event.params.flowId.toString()
-  let entity = FlowEntity.load(flowId)
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity) {
-    let flowHistoryId = event.transaction.hash.toHexString()
-    let flowHistory = new FlowHistory(flowHistoryId)
-    flowHistory.success = true
-    saveFlowHistory(flowHistory,event,event.params.gasUsed,SUCCESS,event.params.payAmountByETH,event.params.payAmountByFeeToken,flowId)
-    let newdetails = entity.details
-    newdetails.push(flowHistory.id)
-    entity.details = newdetails
-    updateFlow(entity,FlowFunction.FlowExecuteSuccess)
-  }
-  
-}
-
-export function handleFlowUpdated(event: FlowUpdated): void {
-  let flowId= event.params.flowId.toString()
-  let entity = FlowEntity.load(flowId)
-
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (entity) {
-    let flowHistoryId = event.transaction.hash.toHexString()
-    let flowHistory =  new FlowHistory(flowHistoryId)
-    saveFlowHistory(flowHistory,event,ZERO_BI,UPGRADE,ZERO_BI,ZERO_BI,flowId)
-    let newdetails = entity.details
-    newdetails.push(flowHistory.id)
-    entity.details = newdetails
-    updateFlow(entity,FlowFunction.FlowUpdated)
-  }
-}
-
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
-
-export function handleSetMinConfig(event: SetMinConfig): void {}
+export function handleFlowExecuteFailed(event: FlowExecuteFailed): void { }
+export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void { }
+export function handleFlowUpdated(event: FlowUpdated): void { }
