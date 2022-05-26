@@ -9,7 +9,7 @@ import {
 } from "../generated/EvaFlowController/EvaFlowController"
 import { LOBExchange } from '../generated/LOBExchange/LOBExchange'
 import { Erc20Order, FlowEntity, FlowHistory } from "../generated/schema"
-import { BI_18, EVAFLOW_CONTROLLER_ADDRESS, FAILED, LOB_EXCHANGE_ADDRESS, saveFlowHistory, SUCCESS, ZERO, ZERO_BI } from "./helpers"
+import { CLOSED, CREATE, EVAFLOW_CONTROLLER_ADDRESS, FAILED, LOB_EXCHANGE_ADDRESS, saveFlowHistory, SUCCESS, ZERO, ZERO_BI } from "./helpers"
 
 export function handleFlowClosed(event: FlowClosed): void {
     let flowId = event.params.flowId.toString()
@@ -25,6 +25,24 @@ export function handleFlowClosed(event: FlowClosed): void {
         } else {
             entity.flowStatus = 0
         }
+
+        let createHash = event.transaction.hash.toHexString()
+        let index = event.transaction.index
+        let flowHistory = new FlowHistory(createHash + index.toString())
+        flowHistory.txHash = createHash
+        saveFlowHistory(flowHistory, entity, event, ZERO_BI, CLOSED, ZERO_BI, ZERO_BI, flowId)
+        
+        let newdetails = entity.details
+        if (newdetails) {
+            newdetails.push(flowHistory.id)
+            entity.details = newdetails
+        }
+        // let detail = entity.details;
+        // if (detail && detail.length == 0) {
+        //     entity.closeStatus = 2
+        // } else {
+        //     entity.closeStatus = 1
+        // }
         entity.save()
     }
 }
@@ -40,11 +58,10 @@ export function handleFlowCreated(event: FlowCreated): void {
 
 
     let checkData = event.params.checkData
-    entity.input = checkData
     let lastVersion = result.lastVersionflow.toHexString()
-    if (lastVersion == LOB_EXCHANGE_ADDRESS) {
+    if (lastVersion.toLowerCase() == LOB_EXCHANGE_ADDRESS.toLowerCase()) {
         let lobContract = LOBExchange.bind(Address.fromString(LOB_EXCHANGE_ADDRESS))
-        let orderInfo = lobContract.getOrderInfo(Bytes.fromHexString(checkData.toHexString().slice(2)))
+        let orderInfo = lobContract.getOrderInfo(Bytes.fromByteArray(checkData))
         if (orderInfo) {
             entity.flowType = 2 // erc20 is 2
             let erc20Order = new Erc20Order(flowId)
@@ -56,13 +73,19 @@ export function handleFlowCreated(event: FlowCreated): void {
             erc20Order.deadline = orderInfo.value0.deadline
             erc20Order.receiptor = orderInfo.value0.receiptor.toHexString()
             erc20Order.minInputPer = orderInfo.value0.minInputPer
-            erc20Order.save
+            erc20Order.blockTime = event.block.timestamp
+            erc20Order.save()
             entity.erc20Order = erc20Order.id
         }
     }
 
+    let createHash = event.transaction.hash.toHexString()
+    let index = event.transaction.index
+    let flowHistory = new FlowHistory(createHash + index.toString())
+    flowHistory.txHash = createHash
+    saveFlowHistory(flowHistory, entity, event, ZERO_BI, CREATE, ZERO_BI, ZERO_BI, flowId)
+    entity.details = [flowHistory.id]
 
-    entity.details = []
     entity.flowName = result.flowName
     entity.flowStatus = 0
     entity.admin = event.params.user.toHexString()
@@ -78,15 +101,20 @@ export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
     // `null` checks allow to create entities on demand
     if (entity) {
         let flowHistoryId = event.transaction.hash.toHexString()
-        let flowHistory = new FlowHistory(flowHistoryId)
+        let index = event.transaction.index
+        let flowHistory = new FlowHistory(flowHistoryId + index.toString())
+        flowHistory.txHash = flowHistoryId
+
         flowHistory.success = false
         flowHistory.failedReason = event.params.reason
-        saveFlowHistory(flowHistory, event, event.params.gasUsed, FAILED, event.params.payAmountByETH, event.params.payAmountByFeeToken, flowId)
+        saveFlowHistory(flowHistory, entity, event, event.params.gasUsed, FAILED, event.params.payAmountByETH, event.params.payAmountByFeeToken, flowId)
+
         let newdetails = entity.details
         if (newdetails) {
             newdetails.push(flowHistory.id)
             entity.details = newdetails
         }
+
         let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
         let result = contract.getFlowMetas(BigInt.fromString(flowId))
         if (result.flowStatus > 0) {
@@ -95,11 +123,11 @@ export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
             entity.flowStatus = 0
         }
         let gasFee = entity.gasFees;
-        if(gasFee){
+        if (gasFee) {
             let allGas = gasFee.plus(event.params.payAmountByETH)
             entity.gasFees = allGas
         }
-        
+
         entity.save()
     }
 }
@@ -112,9 +140,11 @@ export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void {
     // `null` checks allow to create entities on demand
     if (entity) {
         let flowHistoryId = event.transaction.hash.toHexString()
-        let flowHistory = new FlowHistory(flowHistoryId)
+        let index = event.transaction.index
+        let flowHistory = new FlowHistory(flowHistoryId + index.toString())
+        flowHistory.txHash = flowHistoryId
         flowHistory.success = true
-        saveFlowHistory(flowHistory, event, event.params.gasUsed, SUCCESS, event.params.payAmountByETH, event.params.payAmountByFeeToken, flowId)
+        saveFlowHistory(flowHistory, entity, event, event.params.gasUsed, SUCCESS, event.params.payAmountByETH, event.params.payAmountByFeeToken, flowId)
         let newdetails = entity.details
         if (newdetails) {
             newdetails.push(flowHistory.id)
@@ -130,7 +160,7 @@ export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void {
         }
 
         let gasFee = entity.gasFees;
-        if(gasFee){
+        if (gasFee) {
             let allGas = gasFee.plus(event.params.payAmountByETH)
             entity.gasFees = allGas
         }

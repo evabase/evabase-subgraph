@@ -45,7 +45,7 @@ export function handleOrderCreated(event: OrderCreated): void {
     nftOrder.price = order.price
     nftOrder.deadline = order.deadline
     nftOrder.tokenId = order.tokenId
-    nftOrder.blockTIme = event.block.timestamp
+    nftOrder.blockTime = event.block.timestamp
     nftOrder.save()
 
     entity.nftOrder = nftOrder.id

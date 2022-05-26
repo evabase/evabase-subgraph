@@ -6,9 +6,9 @@ dataSources:
     name: LOBExchange
     network: rinkeby
     source:
-      address: '0x538349D0B6488d71Ca798427D0395b52fe861Fc0'
+      address: '0xbE91fEFD8d3d1AD0A10aD38934e061A97ac3071e'
       abi: LOBExchange
-      startBlock: 10732474 
+      startBlock: 10740951 
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -39,7 +39,7 @@ dataSources:
     source:
       address: '0xd4a2660d53F757f91E730Db3727cD24E57106f47'
       abi: EvaFlowController
-      startBlock: 10712537
+      startBlock: 10740951
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -69,7 +69,7 @@ dataSources:
     source:
       address: '0xF2D0Ed1914543d3D22B3b770CBF8A183C7Bc4a8f'
       abi: NftLimitOrderFlowProxy
-      startBlock: 10715114 
+      startBlock: 10740951 
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -96,7 +96,7 @@ dataSources:
     source:
       address: '0x3e235E74BE64FaE98A2CA18E6fe72Dc562541AfC'
       abi: OpsFlowProxy
-      startBlock: 10724886
+      startBlock: 10740951
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

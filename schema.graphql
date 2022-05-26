@@ -1,6 +1,7 @@
 type FlowEntity @entity {
   id: ID!
   flowStatus: Int
+  closeStatus: Int
   flowType: Int
   admin: String
 #  lastKeeper: String
@@ -19,6 +20,7 @@ type FlowEntity @entity {
 type FlowHistory @entity(immutable: true) {
   #event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   id: ID!
+  txHash: String
   flowId: String
   gasUsed: BigInt
   blockTime: BigInt
@@ -39,7 +41,7 @@ type NftOrder @entity {
   price: BigInt #NFT价格
   deadline: BigInt #订单过期时间 s
   tokenId: BigInt
-  blockTIme: BigInt
+  blockTime: BigInt
 }
 
 type Erc20Order @entity {
@@ -52,6 +54,7 @@ type Erc20Order @entity {
   deadline: BigInt!
   receiptor: String!
   minInputPer: BigInt!
+  blockTime: BigInt
 }
 
 type TaskOrder @entity{

@@ -2,12 +2,12 @@
 import { log, BigInt, BigDecimal, Address, Bytes, ethereum, ByteArray } from '@graphprotocol/graph-ts'
 import { EvaFlowController } from '../generated/EvaFlowController/EvaFlowController'
 import { NftLimitOrderFlowProxy } from '../generated/NftLimitOrderFlowProxy/NftLimitOrderFlowProxy'
-import { FlowEntity, FlowHistory } from "../generated/schema"
+import { FlowEntity, FlowHistory, NftOrder } from "../generated/schema"
 
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const EVAFLOW_CONTROLLER_ADDRESS = '0xd4a2660d53F757f91E730Db3727cD24E57106f47'
-export const LOB_EXCHANGE_ADDRESS = '0x538349D0B6488d71Ca798427D0395b52fe861Fc0'
+export const LOB_EXCHANGE_ADDRESS = '0xbE91fEFD8d3d1AD0A10aD38934e061A97ac3071e'
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -99,44 +99,44 @@ export let CLOSED = '5'
 //   return result.flowName
 // }
 
-export function updateFlow(flow: FlowEntity, funType: FlowFunction): void {
-  // static definitions overrides
+// export function updateFlow(flow: FlowEntity, funType: FlowFunction): void {
+//   // static definitions overrides
 
-  let contract = NftLimitOrderFlowProxy.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
+//   let contract = NftLimitOrderFlowProxy.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
 
-  // try types string and bytes32 for symbol
-  let result = contract.getFlowMetas(BigInt.fromString(flow.id))
-  if (result) {
-    if (funType == FlowFunction.FlowDestroyed ||
-      funType == FlowFunction.FlowPaused ||
-      funType == FlowFunction.FlowStart) {
-      if (result.flowStatus > 1) {
-        flow.flowStatus = 2
-      } else {
-        flow.flowStatus = result.flowStatus
-      }
-      flow.lastExecNumber = result.lastExecNumber
-    }
-    if (
-      funType == FlowFunction.FlowUpdated) {
-      flow.flowName = result.flowName
-      flow.lastVersionflow = result.lastVersionflow.toHexString()
+//   // try types string and bytes32 for symbol
+//   // let result = contract.getFlowMetas(BigInt.fromString(flow.id))
+//   // if (result) {
+//   //   if (funType == FlowFunction.FlowDestroyed ||
+//   //     funType == FlowFunction.FlowPaused ||
+//   //     funType == FlowFunction.FlowStart) {
+//   //     if (result.flowStatus > 1) {
+//   //       flow.flowStatus = 2
+//   //     } else {
+//   //       flow.flowStatus = result.flowStatus
+//   //     }
+//   //     flow.lastExecNumber = result.lastExecNumber
+//   //   }
+//   //   if (
+//   //     funType == FlowFunction.FlowUpdated) {
+//   //     flow.flowName = result.flowName
+//   //     flow.lastVersionflow = result.lastVersionflow.toHexString()
 
-    }
+//   //   }
 
-    if (funType == FlowFunction.FlowExecuteFailed ||
-      funType == FlowFunction.FlowExecuteSuccess ||
-      funType == FlowFunction.FlowUpdated) {
-      flow.lastKeeper = result.lastKeeper.toHexString()
-      flow.lastExecNumber = result.lastExecNumber
-    }
+//   //   if (funType == FlowFunction.FlowExecuteFailed ||
+//   //     funType == FlowFunction.FlowExecuteSuccess ||
+//   //     funType == FlowFunction.FlowUpdated) {
+//   //     flow.lastKeeper = result.lastKeeper.toHexString()
+//   //     flow.lastExecNumber = result.lastExecNumber
+//   //   }
 
-    flow.save()
-  }
+//     flow.save()
+//   }
 
-}
+// }
 
-export function saveFlowHistory(flowHistory: FlowHistory,
+export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity,
   event: ethereum.Event,
   fee: BigInt,
   action: string,
@@ -151,6 +151,28 @@ export function saveFlowHistory(flowHistory: FlowHistory,
   flowHistory.ethGasFee = ethGasFee
   flowHistory.evaGasFee = evaGasFee
   flowHistory.flowId = flowId
+
+  let flowTpe = flowEntity.flowType;
+
+  if (action == CREATE) {
+    flowHistory.content = 'flow create'
+  } else if (action == SUCCESS) {
+    if (flowTpe == 1) {
+      flowHistory.content = 'buy NFT item'
+    } else if (flowTpe == 2) {
+      flowHistory.content = 'buy token'
+    } else if (flowTpe == 3) {
+      flowHistory.content = 'do task'
+    }
+  } else if (action == FAILED) {
+    if (flowTpe == 1) {
+      flowHistory.content = 'buy NFT item'
+    } else if (flowTpe == 2) {
+      flowHistory.content = 'buy token'
+    } else if (flowTpe == 3) {
+      flowHistory.content = 'do task'
+    }
+  }
   flowHistory.save()
 }
 

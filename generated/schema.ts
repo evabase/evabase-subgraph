@@ -51,6 +51,15 @@ export class FlowEntity extends Entity {
     this.set("flowStatus", Value.fromI32(value));
   }
 
+  get closeStatus(): i32 {
+    let value = this.get("closeStatus");
+    return value!.toI32();
+  }
+
+  set closeStatus(value: i32) {
+    this.set("closeStatus", Value.fromI32(value));
+  }
+
   get flowType(): i32 {
     let value = this.get("flowType");
     return value!.toI32();
@@ -226,6 +235,23 @@ export class FlowHistory extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get txHash(): string | null {
+    let value = this.get("txHash");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set txHash(value: string | null) {
+    if (!value) {
+      this.unset("txHash");
+    } else {
+      this.set("txHash", Value.fromString(<string>value));
+    }
   }
 
   get flowId(): string | null {
@@ -524,8 +550,8 @@ export class NftOrder extends Entity {
     }
   }
 
-  get blockTIme(): BigInt | null {
-    let value = this.get("blockTIme");
+  get blockTime(): BigInt | null {
+    let value = this.get("blockTime");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -533,11 +559,11 @@ export class NftOrder extends Entity {
     }
   }
 
-  set blockTIme(value: BigInt | null) {
+  set blockTime(value: BigInt | null) {
     if (!value) {
-      this.unset("blockTIme");
+      this.unset("blockTime");
     } else {
-      this.set("blockTIme", Value.fromBigInt(<BigInt>value));
+      this.set("blockTime", Value.fromBigInt(<BigInt>value));
     }
   }
 }
@@ -643,6 +669,23 @@ export class Erc20Order extends Entity {
 
   set minInputPer(value: BigInt) {
     this.set("minInputPer", Value.fromBigInt(value));
+  }
+
+  get blockTime(): BigInt | null {
+    let value = this.get("blockTime");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set blockTime(value: BigInt | null) {
+    if (!value) {
+      this.unset("blockTime");
+    } else {
+      this.set("blockTime", Value.fromBigInt(<BigInt>value));
+    }
   }
 }
 
