@@ -30,6 +30,7 @@ export function handleFlowClosed(event: FlowClosed): void {
         let index = event.transaction.index
         let flowHistory = new FlowHistory(createHash + index.toString())
         flowHistory.txHash = createHash
+        flowHistory.success = true
         saveFlowHistory(flowHistory, entity, event, ZERO_BI, CLOSED, ZERO_BI, ZERO_BI, flowId)
         
         let newdetails = entity.details
@@ -83,6 +84,7 @@ export function handleFlowCreated(event: FlowCreated): void {
     let index = event.transaction.index
     let flowHistory = new FlowHistory(createHash + index.toString())
     flowHistory.txHash = createHash
+    flowHistory.success = true
     saveFlowHistory(flowHistory, entity, event, ZERO_BI, CREATE, ZERO_BI, ZERO_BI, flowId)
     entity.details = [flowHistory.id]
 

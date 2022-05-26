@@ -1,6 +1,7 @@
 /* eslint-disable prefer-const */
 import { log, BigInt, BigDecimal, Address, Bytes, ethereum, ByteArray } from '@graphprotocol/graph-ts'
 import { EvaFlowController } from '../generated/EvaFlowController/EvaFlowController'
+import { LOBExchange } from '../generated/LOBExchange/LOBExchange'
 import { NftLimitOrderFlowProxy } from '../generated/NftLimitOrderFlowProxy/NftLimitOrderFlowProxy'
 import { FlowEntity, FlowHistory, NftOrder } from "../generated/schema"
 
@@ -8,6 +9,10 @@ import { FlowEntity, FlowHistory, NftOrder } from "../generated/schema"
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const EVAFLOW_CONTROLLER_ADDRESS = '0xd4a2660d53F757f91E730Db3727cD24E57106f47'
 export const LOB_EXCHANGE_ADDRESS = '0xbE91fEFD8d3d1AD0A10aD38934e061A97ac3071e'
+export const OPS_FLOW_PROXY_ADDRESS = '0x3e235E74BE64FaE98A2CA18E6fe72Dc562541AfC'
+export const NFT_LIMIT__ADDRESS = '0xF2D0Ed1914543d3D22B3b770CBF8A183C7Bc4a8f'
+
+
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -152,29 +157,34 @@ export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity
   flowHistory.evaGasFee = evaGasFee
   flowHistory.flowId = flowId
 
-  let flowTpe = flowEntity.flowType;
+  let isFlowType = flowEntity.get('flowType');
+  if (isFlowType) {
+    let flowType = flowEntity.flowType
 
-  if (action == CREATE) {
-    flowHistory.content = 'flow create'
-  } else if (action == SUCCESS) {
-    if (flowTpe == 1) {
-      flowHistory.content = 'buy NFT item'
-    } else if (flowTpe == 2) {
-      flowHistory.content = 'buy token'
-    } else if (flowTpe == 3) {
-      flowHistory.content = 'do task'
-    }
-  } else if (action == FAILED) {
-    if (flowTpe == 1) {
-      flowHistory.content = 'buy NFT item'
-    } else if (flowTpe == 2) {
-      flowHistory.content = 'buy token'
-    } else if (flowTpe == 3) {
-      flowHistory.content = 'do task'
+    if (action == CREATE) {
+      flowHistory.content = 'flow create'
+    } else if (action == SUCCESS) {
+      if (flowType == 1) {
+        flowHistory.content = 'buy NFT item'
+      } else if (flowType == 2) {
+        flowHistory.content = 'buy token'
+      } else if (flowType == 3) {
+        flowHistory.content = 'do task'
+      }
+    } else if (action == FAILED) {
+      if (flowType == 1) {
+        flowHistory.content = 'buy NFT item'
+      } else if (flowType == 2) {
+        flowHistory.content = 'buy token'
+      } else if (flowType == 3) {
+        flowHistory.content = 'do task'
+      }
     }
   }
+
   flowHistory.save()
 }
+
 
 export function paraOrderInput(input: Bytes, flowHistory: FlowHistory): void {
   // let decoded =  ethers.utils.AbiCoder.prototype.decode(['address', 'uint8', 'bytes'],input)  
