@@ -9,7 +9,7 @@ import { FlowEntity, FlowHistory, NftOrder } from "../generated/schema"
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const EVAFLOW_CONTROLLER_ADDRESS = '0xd4a2660d53F757f91E730Db3727cD24E57106f47'
 export const LOB_EXCHANGE_ADDRESS = '0xbE91fEFD8d3d1AD0A10aD38934e061A97ac3071e'
-export const OPS_FLOW_PROXY_ADDRESS = '0x3e235E74BE64FaE98A2CA18E6fe72Dc562541AfC'
+export const OPS_FLOW_PROXY_ADDRESS = '0x83D78c37d93c78ec4625caa546453DFe3D2915E5'
 export const NFT_LIMIT__ADDRESS = '0xF2D0Ed1914543d3D22B3b770CBF8A183C7Bc4a8f'
 
 
@@ -179,6 +179,8 @@ export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity
       } else if (flowType == 3) {
         flowHistory.content = 'do task'
       }
+    }else if (action == CLOSED ) {
+      flowHistory.content = 'flow close'
     }
   }
 

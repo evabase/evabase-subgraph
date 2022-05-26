@@ -242,23 +242,23 @@ export class LOBExchange__getOrderInfoResultOrderStruct extends ethereum.Tuple {
     return this[2].toAddress();
   }
 
-  get minRate(): BigInt {
-    return this[3].toBigInt();
-  }
-
   get outputToken(): Address {
-    return this[4].toAddress();
+    return this[3].toAddress();
   }
 
   get deadline(): BigInt {
-    return this[5].toBigInt();
+    return this[4].toBigInt();
   }
 
   get receiptor(): Address {
-    return this[6].toAddress();
+    return this[5].toAddress();
   }
 
   get minInputPer(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get minRate(): BigInt {
     return this[7].toBigInt();
   }
 }
@@ -306,23 +306,23 @@ export class LOBExchange__keyOfInputOStruct extends ethereum.Tuple {
     return this[2].toAddress();
   }
 
-  get minRate(): BigInt {
-    return this[3].toBigInt();
-  }
-
   get outputToken(): Address {
-    return this[4].toAddress();
+    return this[3].toAddress();
   }
 
   get deadline(): BigInt {
-    return this[5].toBigInt();
+    return this[4].toBigInt();
   }
 
   get receiptor(): Address {
-    return this[6].toAddress();
+    return this[5].toAddress();
   }
 
   get minInputPer(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get minRate(): BigInt {
     return this[7].toBigInt();
   }
 }
@@ -478,7 +478,7 @@ export class LOBExchange extends ethereum.SmartContract {
   getOrderInfo(orderId: Bytes): LOBExchange__getOrderInfoResult {
     let result = super.call(
       "getOrderInfo",
-      "getOrderInfo(bytes32):((address,uint96,address,uint96,address,uint64,address,uint96),(uint96,bool))",
+      "getOrderInfo(bytes32):((address,uint96,address,address,uint64,address,uint96,uint160),(uint96,bool))",
       [ethereum.Value.fromFixedBytes(orderId)]
     );
 
@@ -499,7 +499,7 @@ export class LOBExchange extends ethereum.SmartContract {
   ): ethereum.CallResult<LOBExchange__getOrderInfoResult> {
     let result = super.tryCall(
       "getOrderInfo",
-      "getOrderInfo(bytes32):((address,uint96,address,uint96,address,uint64,address,uint96),(uint96,bool))",
+      "getOrderInfo(bytes32):((address,uint96,address,address,uint64,address,uint96,uint160),(uint96,bool))",
       [ethereum.Value.fromFixedBytes(orderId)]
     );
     if (result.reverted) {
@@ -544,7 +544,7 @@ export class LOBExchange extends ethereum.SmartContract {
   keyOf(o: LOBExchange__keyOfInputOStruct): Bytes {
     let result = super.call(
       "keyOf",
-      "keyOf((address,uint96,address,uint96,address,uint64,address,uint96)):(bytes32)",
+      "keyOf((address,uint96,address,address,uint64,address,uint96,uint160)):(bytes32)",
       [ethereum.Value.fromTuple(o)]
     );
 
@@ -554,7 +554,7 @@ export class LOBExchange extends ethereum.SmartContract {
   try_keyOf(o: LOBExchange__keyOfInputOStruct): ethereum.CallResult<Bytes> {
     let result = super.tryCall(
       "keyOf",
-      "keyOf((address,uint96,address,uint96,address,uint64,address,uint96)):(bytes32)",
+      "keyOf((address,uint96,address,address,uint64,address,uint96,uint160)):(bytes32)",
       [ethereum.Value.fromTuple(o)]
     );
     if (result.reverted) {
@@ -842,23 +842,23 @@ export class CreateCallOrderStruct extends ethereum.Tuple {
     return this[2].toAddress();
   }
 
-  get minRate(): BigInt {
-    return this[3].toBigInt();
-  }
-
   get outputToken(): Address {
-    return this[4].toAddress();
+    return this[3].toAddress();
   }
 
   get deadline(): BigInt {
-    return this[5].toBigInt();
+    return this[4].toBigInt();
   }
 
   get receiptor(): Address {
-    return this[6].toAddress();
+    return this[5].toAddress();
   }
 
   get minInputPer(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get minRate(): BigInt {
     return this[7].toBigInt();
   }
 }
@@ -912,23 +912,23 @@ export class CreateOrderCallOrderStruct extends ethereum.Tuple {
     return this[2].toAddress();
   }
 
-  get minRate(): BigInt {
-    return this[3].toBigInt();
-  }
-
   get outputToken(): Address {
-    return this[4].toAddress();
+    return this[3].toAddress();
   }
 
   get deadline(): BigInt {
-    return this[5].toBigInt();
+    return this[4].toBigInt();
   }
 
   get receiptor(): Address {
-    return this[6].toAddress();
+    return this[5].toAddress();
   }
 
   get minInputPer(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get minRate(): BigInt {
     return this[7].toBigInt();
   }
 }

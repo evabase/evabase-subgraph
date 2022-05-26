@@ -299,11 +299,6 @@
             "type": "address"
           },
           {
-            "internalType": "uint96",
-            "name": "minRate",
-            "type": "uint96"
-          },
-          {
             "internalType": "address",
             "name": "outputToken",
             "type": "address"
@@ -322,6 +317,11 @@
             "internalType": "uint96",
             "name": "minInputPer",
             "type": "uint96"
+          },
+          {
+            "internalType": "uint160",
+            "name": "minRate",
+            "type": "uint160"
           }
         ],
         "internalType": "struct Order",
@@ -354,11 +354,6 @@
             "type": "address"
           },
           {
-            "internalType": "uint96",
-            "name": "minRate",
-            "type": "uint96"
-          },
-          {
             "internalType": "address",
             "name": "outputToken",
             "type": "address"
@@ -377,6 +372,11 @@
             "internalType": "uint96",
             "name": "minInputPer",
             "type": "uint96"
+          },
+          {
+            "internalType": "uint160",
+            "name": "minRate",
+            "type": "uint160"
           }
         ],
         "internalType": "struct Order",
@@ -505,11 +505,6 @@
             "type": "address"
           },
           {
-            "internalType": "uint96",
-            "name": "minRate",
-            "type": "uint96"
-          },
-          {
             "internalType": "address",
             "name": "outputToken",
             "type": "address"
@@ -528,6 +523,11 @@
             "internalType": "uint96",
             "name": "minInputPer",
             "type": "uint96"
+          },
+          {
+            "internalType": "uint160",
+            "name": "minRate",
+            "type": "uint160"
           }
         ],
         "internalType": "struct Order",
@@ -594,11 +594,6 @@
             "type": "address"
           },
           {
-            "internalType": "uint96",
-            "name": "minRate",
-            "type": "uint96"
-          },
-          {
             "internalType": "address",
             "name": "outputToken",
             "type": "address"
@@ -617,6 +612,11 @@
             "internalType": "uint96",
             "name": "minInputPer",
             "type": "uint96"
+          },
+          {
+            "internalType": "uint160",
+            "name": "minRate",
+            "type": "uint160"
           }
         ],
         "internalType": "struct Order",

@@ -672,6 +672,32 @@ export class CreateTaskCallTaskStruct extends ethereum.Tuple {
   }
 }
 
+export class EnableERC1820Call extends ethereum.Call {
+  get inputs(): EnableERC1820Call__Inputs {
+    return new EnableERC1820Call__Inputs(this);
+  }
+
+  get outputs(): EnableERC1820Call__Outputs {
+    return new EnableERC1820Call__Outputs(this);
+  }
+}
+
+export class EnableERC1820Call__Inputs {
+  _call: EnableERC1820Call;
+
+  constructor(call: EnableERC1820Call) {
+    this._call = call;
+  }
+}
+
+export class EnableERC1820Call__Outputs {
+  _call: EnableERC1820Call;
+
+  constructor(call: EnableERC1820Call) {
+    this._call = call;
+  }
+}
+
 export class ExecuteCall extends ethereum.Call {
   get inputs(): ExecuteCall__Inputs {
     return new ExecuteCall__Inputs(this);
@@ -736,6 +762,32 @@ export class MulticallCall__Outputs {
   _call: MulticallCall;
 
   constructor(call: MulticallCall) {
+    this._call = call;
+  }
+}
+
+export class RemoveERC1820Call extends ethereum.Call {
+  get inputs(): RemoveERC1820Call__Inputs {
+    return new RemoveERC1820Call__Inputs(this);
+  }
+
+  get outputs(): RemoveERC1820Call__Outputs {
+    return new RemoveERC1820Call__Outputs(this);
+  }
+}
+
+export class RemoveERC1820Call__Inputs {
+  _call: RemoveERC1820Call;
+
+  constructor(call: RemoveERC1820Call) {
+    this._call = call;
+  }
+}
+
+export class RemoveERC1820Call__Outputs {
+  _call: RemoveERC1820Call;
+
+  constructor(call: RemoveERC1820Call) {
     this._call = call;
   }
 }

@@ -94,7 +94,7 @@ dataSources:
     name: OpsFlowProxy
     network: rinkeby
     source:
-      address: '0x3e235E74BE64FaE98A2CA18E6fe72Dc562541AfC'
+      address: '0x83D78c37d93c78ec4625caa546453DFe3D2915E5'
       abi: OpsFlowProxy
       startBlock: 10740951
     mapping:
