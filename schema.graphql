@@ -8,6 +8,7 @@ type FlowEntity @entity {
 #  lastVersionflow: String
 #  lastExecNumber: BigInt
 #  maxVaildBlockNumber: BigInt
+  deadline: BigInt
   flowName: String
   input: Bytes
   gasFees: BigInt

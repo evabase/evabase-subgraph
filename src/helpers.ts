@@ -9,7 +9,7 @@ import { FlowEntity, FlowHistory, NftOrder } from "../generated/schema"
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export const EVAFLOW_CONTROLLER_ADDRESS = '0xd4a2660d53F757f91E730Db3727cD24E57106f47'
 export const LOB_EXCHANGE_ADDRESS = '0xbE91fEFD8d3d1AD0A10aD38934e061A97ac3071e'
-export const OPS_FLOW_PROXY_ADDRESS = '0x83D78c37d93c78ec4625caa546453DFe3D2915E5'
+export const OPS_FLOW_PROXY_ADDRESS = '0x109826584d852830fBef626Abd5BCC5aD6237C7f'
 export const NFT_LIMIT__ADDRESS = '0xF2D0Ed1914543d3D22B3b770CBF8A183C7Bc4a8f'
 
 
@@ -162,7 +162,13 @@ export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity
     let flowType = flowEntity.flowType
 
     if (action == CREATE) {
-      flowHistory.content = 'flow create'
+      if (flowType == 1) {
+        flowHistory.content = 'nft order create'
+      } else if (flowType == 2) {
+        flowHistory.content = 'erc20 order create'
+      } else if (flowType == 3) {
+        flowHistory.content = 'task create'
+      }
     } else if (action == SUCCESS) {
       if (flowType == 1) {
         flowHistory.content = 'buy NFT item'

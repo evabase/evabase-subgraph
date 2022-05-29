@@ -27,23 +27,29 @@ export function handleFlowClosed(event: FlowClosed): void {
         }
 
         let createHash = event.transaction.hash.toHexString()
-        let index = event.transaction.index
+        let index = event.logIndex
         let flowHistory = new FlowHistory(createHash + index.toString())
         flowHistory.txHash = createHash
         flowHistory.success = true
         saveFlowHistory(flowHistory, entity, event, ZERO_BI, CLOSED, ZERO_BI, ZERO_BI, flowId)
-        
+
         let newdetails = entity.details
         if (newdetails) {
             newdetails.push(flowHistory.id)
             entity.details = newdetails
         }
-        // let detail = entity.details;
-        // if (detail && detail.length == 0) {
-        //     entity.closeStatus = 2
-        // } else {
-        //     entity.closeStatus = 1
-        // }
+
+        let isDeadline = entity.get("deadline")
+        if (isDeadline) {
+            let deadlineEntity = entity.deadline
+            let blockTime = event.block.timestamp
+            if (deadlineEntity < blockTime) {
+                entity.closeStatus = 2
+            } else {
+                entity.closeStatus = 1
+            }
+        }
+
         entity.save()
     }
 }
@@ -72,6 +78,7 @@ export function handleFlowCreated(event: FlowCreated): void {
             erc20Order.minRate = orderInfo.value0.minRate
             erc20Order.outputToken = orderInfo.value0.outputToken.toHexString()
             erc20Order.deadline = orderInfo.value0.deadline
+            entity.deadline = orderInfo.value0.deadline
             erc20Order.receiptor = orderInfo.value0.receiptor.toHexString()
             erc20Order.minInputPer = orderInfo.value0.minInputPer
             erc20Order.blockTime = event.block.timestamp
@@ -81,7 +88,7 @@ export function handleFlowCreated(event: FlowCreated): void {
     }
 
     let createHash = event.transaction.hash.toHexString()
-    let index = event.transaction.index
+    let index = event.logIndex
     let flowHistory = new FlowHistory(createHash + index.toString())
     flowHistory.txHash = createHash
     flowHistory.success = true
@@ -103,7 +110,7 @@ export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
     // `null` checks allow to create entities on demand
     if (entity) {
         let flowHistoryId = event.transaction.hash.toHexString()
-        let index = event.transaction.index
+        let index = event.logIndex
         let flowHistory = new FlowHistory(flowHistoryId + index.toString())
         flowHistory.txHash = flowHistoryId
 
@@ -142,7 +149,7 @@ export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void {
     // `null` checks allow to create entities on demand
     if (entity) {
         let flowHistoryId = event.transaction.hash.toHexString()
-        let index = event.transaction.index
+        let index = event.logIndex
         let flowHistory = new FlowHistory(flowHistoryId + index.toString())
         flowHistory.txHash = flowHistoryId
         flowHistory.success = true

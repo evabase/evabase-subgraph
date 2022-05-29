@@ -49,6 +49,7 @@ export function handleOrderCreated(event: OrderCreated): void {
     nftOrder.save()
 
     entity.nftOrder = nftOrder.id
+    entity.deadline = order.deadline
     entity.save()
 }
 

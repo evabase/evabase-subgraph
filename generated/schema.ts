@@ -86,6 +86,15 @@ export class FlowEntity extends Entity {
     }
   }
 
+  get deadline(): BigInt {
+    let value = this.get("deadline");
+    return value!.toBigInt();
+  }
+
+  set deadline(value: BigInt) {
+    this.set("deadline", Value.fromBigInt(value));
+  }
+
   get flowName(): string | null {
     let value = this.get("flowName");
     if (!value || value.kind == ValueKind.NULL) {

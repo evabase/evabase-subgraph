@@ -34,6 +34,7 @@ export function handleTaskCreated(event: TaskCreated): void {
     taskOrder.save()
 
     entity.taskOrder = taskOrder.id
+    entity.deadline = task.deadline
     entity.save()
 }
 export function handleTaskExecuted(event: TaskExecuted): void {}
