@@ -4,38 +4,20 @@ import {
     OrderExecuted,
     OwnershipTransferred
 } from "../generated/NftLimitOrderFlowProxy/NftLimitOrderFlowProxy"
-import { FlowEntity, FlowHistory, NftOrder } from "../generated/schema"
-import {
-    // updateFlow,
-    // saveFlow,
-    ZERO_BI,
-    // FlowFunction,
-    saveFlowHistory,
-    CREATE,
-    UPGRADE,
-    CLOSED,
-    FAILED,
-    SUCCESS,
-    NULL_STRING,
-} from './helpers'
+import { NftOrder } from "../generated/schema"
+import { ACTIVE, checkFlowEntityExists, NFT } from "./helpers"
 
 export function handleOrderCancelled(event: OrderCancelled): void {
 
 }
 
+/**
+ * 
+ * @param event nft订单创建事件
+ */
 export function handleOrderCreated(event: OrderCreated): void {
     let flowId = event.params.flowId.toString()
-    let entity = FlowEntity.load(flowId)
-    if (!entity) {
-        entity = new FlowEntity(flowId)
-    }
-    // let createHash = event.transaction.hash.toHexString()
-    // let flowHistory = new FlowHistory(createHash)
-    // saveFlowHistory(flowHistory, event, ZERO_BI, CREATE, ZERO_BI, ZERO_BI, NULL_STRING, flowId)
-    // entity.details = [flowHistory.id]
-    entity.admin = event.params.user.toHexString()
-    entity.flowStatus = 0
-    entity.flowType = 1
+    let entity = checkFlowEntityExists(flowId)
 
     let nftOrder = new NftOrder(flowId)
     let order = event.params.order
@@ -48,11 +30,13 @@ export function handleOrderCreated(event: OrderCreated): void {
     nftOrder.blockTime = event.block.timestamp
     nftOrder.save()
 
+    entity.admin = event.params.user.toHexString()
+    entity.flowStatus = ACTIVE
+    entity.flowType = NFT
     entity.nftOrder = nftOrder.id
     entity.deadline = order.deadline
     entity.save()
 }
-
 
 export function handleOrderExecuted(event: OrderExecuted): void { }
 

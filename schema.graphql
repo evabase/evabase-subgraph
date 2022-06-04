@@ -1,8 +1,8 @@
 type FlowEntity @entity {
   id: ID!
-  flowStatus: Int
-  closeStatus: Int
-  flowType: Int
+  flowStatus: String
+  closeStatus: String
+  flowType: String
   admin: String
 #  lastKeeper: String
 #  lastVersionflow: String

@@ -42,31 +42,55 @@ export class FlowEntity extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get flowStatus(): i32 {
+  get flowStatus(): string | null {
     let value = this.get("flowStatus");
-    return value!.toI32();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set flowStatus(value: i32) {
-    this.set("flowStatus", Value.fromI32(value));
+  set flowStatus(value: string | null) {
+    if (!value) {
+      this.unset("flowStatus");
+    } else {
+      this.set("flowStatus", Value.fromString(<string>value));
+    }
   }
 
-  get closeStatus(): i32 {
+  get closeStatus(): string | null {
     let value = this.get("closeStatus");
-    return value!.toI32();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set closeStatus(value: i32) {
-    this.set("closeStatus", Value.fromI32(value));
+  set closeStatus(value: string | null) {
+    if (!value) {
+      this.unset("closeStatus");
+    } else {
+      this.set("closeStatus", Value.fromString(<string>value));
+    }
   }
 
-  get flowType(): i32 {
+  get flowType(): string | null {
     let value = this.get("flowType");
-    return value!.toI32();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
   }
 
-  set flowType(value: i32) {
-    this.set("flowType", Value.fromI32(value));
+  set flowType(value: string | null) {
+    if (!value) {
+      this.unset("flowType");
+    } else {
+      this.set("flowType", Value.fromString(<string>value));
+    }
   }
 
   get admin(): string | null {
@@ -86,13 +110,21 @@ export class FlowEntity extends Entity {
     }
   }
 
-  get deadline(): BigInt {
+  get deadline(): BigInt | null {
     let value = this.get("deadline");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set deadline(value: BigInt) {
-    this.set("deadline", Value.fromBigInt(value));
+  set deadline(value: BigInt | null) {
+    if (!value) {
+      this.unset("deadline");
+    } else {
+      this.set("deadline", Value.fromBigInt(<BigInt>value));
+    }
   }
 
   get flowName(): string | null {
