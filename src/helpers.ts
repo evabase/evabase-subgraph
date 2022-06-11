@@ -110,33 +110,28 @@ export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity
       if (type == TASK) {
         flowHistory.content = 'task create'
       }
-
     } else if (action == SUCCESS_ACTION) {
-      if (action == CREATE_ACTION) {
-        if (type == NFT) {
-          flowHistory.content = 'buy NFT item'
-        }
-        if (type == ERC20) {
-          flowHistory.content = 'buy token'
-        }
-        if (type == TASK) {
-          flowHistory.content = 'do task'
-        }
-      } else if (action == FAILED_ACTION) {
-        if (action == CREATE_ACTION) {
-          if (type == NFT) {
-            flowHistory.content = 'buy NFT item'
-          }
-          if (type == ERC20) {
-            flowHistory.content = 'buy token'
-          }
-          if (type == TASK) {
-            flowHistory.content = 'do task'
-          }
-        }
-      } else if (action == CLOSED_ACTION) {
-        flowHistory.content = 'flow close'
+      if (type == NFT) {
+        flowHistory.content = 'buy NFT item'
       }
+      if (type == ERC20) {
+        flowHistory.content = 'buy token'
+      }
+      if (type == TASK) {
+        flowHistory.content = 'do task'
+      }
+    } else if (action == FAILED_ACTION) {
+      if (type == NFT) {
+        flowHistory.content = 'buy NFT item'
+      }
+      if (type == ERC20) {
+        flowHistory.content = 'buy token'
+      }
+      if (type == TASK) {
+        flowHistory.content = 'do task'
+      }
+    } else if (action == CLOSED_ACTION) {
+      flowHistory.content = 'flow close'
     }
   }
   flowHistory.save()
