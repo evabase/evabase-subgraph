@@ -6,11 +6,11 @@ import { FlowEntity, FlowHistory } from "../generated/schema"
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
-export const EVAFLOW_CONTROLLER_ADDRESS = '0x7eA10f2840c8B6E734697D998043653C25139C47'
-export const LOB_EXCHANGE_ADDRESS = '0x548C85Eb46d6A318731a97047243Cced24179066'
-export const OPS_FLOW_PROXY_ADDRESS = '0xeb921673666678c8648A0aAa3fC15Ad7EC51bfB8'
-export const NFT_LIMIT__ADDRESS = '0xB011B927Cb38F2433164562283aeD25C59794F7B'
-
+export const evaFlowController = '0x7eA10f2840c8B6E734697D998043653C25139C47'
+export const lobBExchange = '0x548C85Eb46d6A318731a97047243Cced24179066'
+export const opsFlowProxy = '0xeb921673666678c8648A0aAa3fC15Ad7EC51bfB8'
+export const nftLimitOrderFlow = '0xB011B927Cb38F2433164562283aeD25C59794F7B'
+export const evaFlowStatusUpkeep = "0xFaBbf45C33d41eF1a41d687d43F4b0B3ec89eeC1"
 
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
@@ -28,10 +28,17 @@ export let CLOSED_ACTION = '5'
 export let ACTIVE = 'Active'
 export let SUCCESS = 'Success'
 export let EXPIRED = 'Expired'
+export let CANCEL = 'Cancel'
 
 export let NFT = 'NFT'
 export let ERC20 = 'ERC20'
 export let TASK = 'TASK'
+
+enum TokenStatus {
+  OriginalOwner,
+  SecondOwner,
+  ThirdOwner
+}
 
 
 /**
@@ -53,7 +60,7 @@ export function checkFlowEntityExists(flowId: string): FlowEntity {
  * @returns 
  */
 export function getFlowStatus(flowId: string): string {
-  let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
+  let contract = EvaFlowController.bind(Address.fromString(evaFlowController))
   let result = contract.getFlowMetas(BigInt.fromString(flowId))
   if (result.flowStatus > 0) {
     return SUCCESS
@@ -76,20 +83,21 @@ export function getFlowStatus(flowId: string): string {
  * @param success 
  */
 export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity,
-  event: ethereum.Event,
   fee: BigInt,
   action: string,
   ethGasFee: BigInt,
   evaGasFee: BigInt,
   flowId: string,
   txHash: string,
-  success: boolean
+  success: boolean,
+  blockTime: BigInt,
+  from: string
 ): void {
 
   flowHistory.gasUsed = fee
-  flowHistory.blockTime = event.block.timestamp
+  flowHistory.blockTime = blockTime
   flowHistory.action = action
-  flowHistory.from = event.transaction.from.toHexString()
+  flowHistory.from = from
   flowHistory.ethGasFee = ethGasFee
   flowHistory.evaGasFee = evaGasFee
   flowHistory.flowId = flowId
@@ -102,37 +110,64 @@ export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity
 
     if (action == CREATE_ACTION) {
       if (type == NFT) {
-        flowHistory.content = 'nft order create'
+        flowHistory.content = 'Create NFT Order '
       }
       if (type == ERC20) {
-        flowHistory.content = 'erc20 order create'
+        flowHistory.content = 'Create ERC20 Limit Order'
       }
       if (type == TASK) {
-        flowHistory.content = 'task create'
+        flowHistory.content = 'Create Task'
       }
     } else if (action == SUCCESS_ACTION) {
       if (type == NFT) {
-        flowHistory.content = 'buy NFT item'
+        flowHistory.content = 'Buy NFT Item'
       }
       if (type == ERC20) {
-        flowHistory.content = 'buy token'
+        flowHistory.content = 'Buy Token'
       }
       if (type == TASK) {
-        flowHistory.content = 'do task'
+        flowHistory.content = 'Execute Task'
       }
     } else if (action == FAILED_ACTION) {
       if (type == NFT) {
-        flowHistory.content = 'buy NFT item'
+        flowHistory.content = 'Buy NFT Item'
       }
       if (type == ERC20) {
-        flowHistory.content = 'buy token'
+        flowHistory.content = 'Buy Token'
       }
       if (type == TASK) {
-        flowHistory.content = 'do task'
+        flowHistory.content = 'Execute Task'
       }
     } else if (action == CLOSED_ACTION) {
-      flowHistory.content = 'flow close'
+      flowHistory.content = 'Close Flow'
     }
   }
   flowHistory.save()
+}
+
+export function handSuccessAndFailedEvent(flowId: string, hash: string, index: BigInt, action: string,
+  failedReason: string, success: boolean, fee: BigInt, ethGasFee: BigInt,
+  evaGasFee: BigInt, blockTime: BigInt, from: string): void {
+  let entity = FlowEntity.load(flowId)
+  if (entity) {
+    let flowHistory = new FlowHistory(hash + index.toString())
+
+    flowHistory.failedReason = failedReason
+    saveFlowHistory(flowHistory, entity, fee, action, ethGasFee, evaGasFee, flowId, hash, success, blockTime, from)
+
+    let newdetails = entity.details
+    if (newdetails) {
+      newdetails.push(flowHistory.id)
+      entity.details = newdetails
+    }
+
+    entity.flowStatus = getFlowStatus(flowId)
+    let gasFee = entity.gasFees;
+    if (gasFee) {
+      let allGas = gasFee.plus(ethGasFee)
+      entity.gasFees = allGas
+    }
+
+    entity.save()
+  }
 }

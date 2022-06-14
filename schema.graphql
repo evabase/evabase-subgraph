@@ -1,6 +1,6 @@
 type FlowEntity @entity {
   id: ID!
-  flowStatus: String
+  flowStatus: FlowStatus
   closeStatus: String
   flowType: String
   admin: String
@@ -66,5 +66,12 @@ type TaskOrder @entity{
   deadline: BigInt!
   lastExecTime: BigInt!
   interval: BigInt!
-  blockTIme: BigInt!
+  blockTime: BigInt!
+}
+
+enum FlowStatus {
+  Active
+  Success
+  Expired
+  Cancel
 }

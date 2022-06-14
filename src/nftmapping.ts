@@ -7,9 +7,9 @@ import {
 import { NftOrder } from "../generated/schema"
 import { ACTIVE, checkFlowEntityExists, NFT } from "./helpers"
 
-export function handleOrderCancelled(event: OrderCancelled): void {
+// export function handleOrderCancelled(event: OrderCancelled): void {
 
-}
+// }
 
 /**
  * 
@@ -38,6 +38,6 @@ export function handleOrderCreated(event: OrderCreated): void {
     entity.save()
 }
 
-export function handleOrderExecuted(event: OrderExecuted): void { }
+// export function handleOrderExecuted(event: OrderExecuted): void { }
 
-export function handleOwnershipTransferred(event: OwnershipTransferred): void { }
+// export function handleOwnershipTransferred(event: OwnershipTransferred): void { }

@@ -823,12 +823,12 @@ export class TaskOrder extends Entity {
     this.set("interval", Value.fromBigInt(value));
   }
 
-  get blockTIme(): BigInt {
-    let value = this.get("blockTIme");
+  get blockTime(): BigInt {
+    let value = this.get("blockTime");
     return value!.toBigInt();
   }
 
-  set blockTIme(value: BigInt) {
-    this.set("blockTIme", Value.fromBigInt(value));
+  set blockTime(value: BigInt) {
+    this.set("blockTime", Value.fromBigInt(value));
   }
 }

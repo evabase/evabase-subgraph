@@ -9,7 +9,10 @@ import {
 } from "../generated/EvaFlowController/EvaFlowController"
 import { LOBExchange } from '../generated/LOBExchange/LOBExchange'
 import { Erc20Order, FlowEntity, FlowHistory } from "../generated/schema"
-import { ACTIVE, checkFlowEntityExists, CLOSED_ACTION, CREATE_ACTION, ERC20, EVAFLOW_CONTROLLER_ADDRESS, EXPIRED, FAILED_ACTION, getFlowStatus, LOB_EXCHANGE_ADDRESS, saveFlowHistory, SUCCESS, SUCCESS_ACTION, ZERO_BI } from "./helpers"
+import {
+    ACTIVE, checkFlowEntityExists, CLOSED_ACTION, CREATE_ACTION, ERC20,
+    evaFlowController, EXPIRED, FAILED_ACTION, getFlowStatus, lobBExchange, saveFlowHistory, SUCCESS, SUCCESS_ACTION, ZERO_BI, evaFlowStatusUpkeep, CANCEL, handSuccessAndFailedEvent
+} from "./helpers"
 
 /**
  * 创建flow
@@ -20,13 +23,13 @@ export function handleFlowCreated(event: FlowCreated): void {
     let entity = checkFlowEntityExists(flowId)
 
     // 获取erc20 相关数据
-    let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
+    let contract = EvaFlowController.bind(Address.fromString(evaFlowController))
     let result = contract.getFlowMetas(BigInt.fromString(flowId))
 
     let checkData = event.params.checkData
     let lastVersion = result.lastVersionflow.toHexString()
-    if (lastVersion.toLowerCase() == LOB_EXCHANGE_ADDRESS.toLowerCase()) {
-        let lobContract = LOBExchange.bind(Address.fromString(LOB_EXCHANGE_ADDRESS))
+    if (lastVersion.toLowerCase() == lobBExchange.toLowerCase()) {
+        let lobContract = LOBExchange.bind(Address.fromString(lobBExchange))
         let orderInfo = lobContract.getOrderInfo(Bytes.fromByteArray(checkData))
         if (orderInfo) {
 
@@ -51,7 +54,9 @@ export function handleFlowCreated(event: FlowCreated): void {
     let createHash = event.transaction.hash.toHexString()
     let index = event.logIndex
     let flowHistory = new FlowHistory(createHash + index.toString())
-    saveFlowHistory(flowHistory, entity, event, ZERO_BI, CREATE_ACTION, ZERO_BI, ZERO_BI, flowId, createHash, true)
+    let blockIime = event.block.timestamp
+    let from = event.transaction.from.toHexString()
+    saveFlowHistory(flowHistory, entity, ZERO_BI, CREATE_ACTION, ZERO_BI, ZERO_BI, flowId, createHash, true, blockIime, from)
 
     entity.details = [flowHistory.id]
     entity.flowName = result.flowName
@@ -68,7 +73,7 @@ export function handleFlowClosed(event: FlowClosed): void {
     // Entities only exist after they have been saved to the store;
     // `null` checks allow to create entities on demand
     if (entity) {
-        let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
+        let contract = EvaFlowController.bind(Address.fromString(evaFlowController))
         let result = contract.getFlowMetas(BigInt.fromString(flowId))
         if (result.flowStatus > 0) {
             entity.flowStatus = SUCCESS
@@ -79,7 +84,9 @@ export function handleFlowClosed(event: FlowClosed): void {
         let createHash = event.transaction.hash.toHexString()
         let index = event.logIndex
         let flowHistory = new FlowHistory(createHash + index.toString())
-        saveFlowHistory(flowHistory, entity, event, ZERO_BI, CLOSED_ACTION, ZERO_BI, ZERO_BI, flowId, createHash, true)
+        let blockIime = event.block.timestamp
+        let from = event.transaction.from.toHexString()
+        saveFlowHistory(flowHistory, entity, ZERO_BI, CLOSED_ACTION, ZERO_BI, ZERO_BI, flowId, createHash, true, blockIime, from)
 
         let newdetails = entity.details
         if (newdetails) {
@@ -91,10 +98,16 @@ export function handleFlowClosed(event: FlowClosed): void {
         if (isDeadline) {
             let deadlineEntity = entity.deadline
             let blockTime = event.block.timestamp
-            if (deadlineEntity < blockTime) {
+
+            let input = event.transaction.input
+            if (input.toHexString().substr(0, 10).toLowerCase() == "0x7bbaf1ea".toLowerCase()) {
                 entity.closeStatus = EXPIRED
             } else {
-                entity.closeStatus = SUCCESS
+                if (deadlineEntity < blockTime) {
+                    entity.closeStatus = CANCEL
+                } else {
+                    entity.closeStatus = SUCCESS
+                }
             }
         }
         entity.save()
@@ -105,60 +118,30 @@ export function handleFlowClosed(event: FlowClosed): void {
 
 export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
     let flowId = event.params.flowId.toString()
+    let fee = event.params.gasUsed
+    let ethGasFee = event.params.payAmountByETH
+    let evaGasFee = event.params.payAmountByFeeToken
+    let hash = event.transaction.hash.toHexString()
+    let index = event.logIndex
+    let reason = event.params.reason
+    let blockIime = event.block.timestamp
+    let from = event.transaction.from.toHexString()
+    handSuccessAndFailedEvent(flowId, hash, index, FAILED_ACTION, reason, false, fee, ethGasFee, evaGasFee, blockIime, from)
     let entity = FlowEntity.load(flowId)
-
-    if (entity) {
-        let failedHash = event.transaction.hash.toHexString()
-        let index = event.logIndex
-        let flowHistory = new FlowHistory(failedHash + index.toString())
-
-        flowHistory.failedReason = event.params.reason
-        saveFlowHistory(flowHistory, entity, event, event.params.gasUsed, FAILED_ACTION, event.params.payAmountByETH, event.params.payAmountByFeeToken, flowId, failedHash, false)
-
-        let newdetails = entity.details
-        if (newdetails) {
-            newdetails.push(flowHistory.id)
-            entity.details = newdetails
-        }
-
-        entity.flowStatus = getFlowStatus(flowId)
-        let gasFee = entity.gasFees;
-        if (gasFee) {
-            let allGas = gasFee.plus(event.params.payAmountByETH)
-            entity.gasFees = allGas
-        }
-
-        entity.save()
-    }
 }
 
 export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void {
+
     let flowId = event.params.flowId.toString()
-    let entity = FlowEntity.load(flowId)
-
-    // Entities only exist after they have been saved to the store;
-    // `null` checks allow to create entities on demand
-    if (entity) {
-        let successHash = event.transaction.hash.toHexString()
-        let index = event.logIndex
-        let flowHistory = new FlowHistory(successHash + index.toString())
-
-        saveFlowHistory(flowHistory, entity, event, event.params.gasUsed, SUCCESS_ACTION, event.params.payAmountByETH, event.params.payAmountByFeeToken, flowId, successHash, true)
-        let newdetails = entity.details
-        if (newdetails) {
-            newdetails.push(flowHistory.id)
-            entity.details = newdetails
-        }
-
-        entity.flowStatus = getFlowStatus(flowId)
-
-        let gasFee = entity.gasFees;
-        if (gasFee) {
-            let allGas = gasFee.plus(event.params.payAmountByETH)
-            entity.gasFees = allGas
-        }
-        entity.save()
-    }
+    let fee = event.params.gasUsed
+    let ethGasFee = event.params.payAmountByETH
+    let evaGasFee = event.params.payAmountByFeeToken
+    let hash = event.transaction.hash.toHexString()
+    let index = event.logIndex
+    let reason = ""
+    let blockIime = event.block.timestamp
+    let from = event.transaction.from.toHexString()
+    handSuccessAndFailedEvent(flowId, hash, index, SUCCESS_ACTION, reason, true, fee, ethGasFee, evaGasFee, blockIime, from)
 }
-export function handleFlowUpdated(event: FlowUpdated): void { }
+// export function handleFlowUpdated(event: FlowUpdated): void { }
 
