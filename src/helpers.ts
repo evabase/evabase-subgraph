@@ -28,7 +28,7 @@ export let CLOSED_ACTION = '5'
 export let ACTIVE = 'Active'
 export let SUCCESS = 'Success'
 export let EXPIRED = 'Expired'
-export let CANCEL = 'Cancel'
+export let CANCELED = 'Canceled'
 
 export let NFT = 'NFT'
 export let ERC20 = 'ERC20'
@@ -147,7 +147,7 @@ export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity
 
 export function handSuccessAndFailedEvent(flowId: string, hash: string, index: BigInt, action: string,
   failedReason: string, success: boolean, fee: BigInt, ethGasFee: BigInt,
-  evaGasFee: BigInt, blockTime: BigInt, from: string): void {
+  evaGasFee: BigInt, blockTime: BigInt, from: string, blockNumber: BigInt): void {
   let entity = FlowEntity.load(flowId)
   if (entity) {
     let flowHistory = new FlowHistory(hash + index.toString())
@@ -167,7 +167,7 @@ export function handSuccessAndFailedEvent(flowId: string, hash: string, index: B
       let allGas = gasFee.plus(ethGasFee)
       entity.gasFees = allGas
     }
-
+    entity.blockNumber = blockNumber
     entity.save()
   }
 }

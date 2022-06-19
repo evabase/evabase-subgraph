@@ -1,15 +1,8 @@
 import {
-    OrderCancelled,
-    OrderCreated,
-    OrderExecuted,
-    OwnershipTransferred
+    OrderCreated
 } from "../generated/NftLimitOrderFlowProxy/NftLimitOrderFlowProxy"
 import { NftOrder } from "../generated/schema"
 import { ACTIVE, checkFlowEntityExists, NFT } from "./helpers"
-
-// export function handleOrderCancelled(event: OrderCancelled): void {
-
-// }
 
 /**
  * 
@@ -28,6 +21,7 @@ export function handleOrderCreated(event: OrderCreated): void {
     nftOrder.deadline = order.deadline
     nftOrder.tokenId = order.tokenId
     nftOrder.blockTime = event.block.timestamp
+    entity.blockTime = event.block.timestamp
     nftOrder.save()
 
     entity.admin = event.params.user.toHexString()
@@ -38,6 +32,3 @@ export function handleOrderCreated(event: OrderCreated): void {
     entity.save()
 }
 
-// export function handleOrderExecuted(event: OrderExecuted): void { }
-
-// export function handleOwnershipTransferred(event: OwnershipTransferred): void { }

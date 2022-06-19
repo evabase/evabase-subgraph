@@ -1,14 +1,6 @@
-import {
-    OwnershipTransferred,
-    TaskCancelled,
-    TaskCreated,
-    TaskExecuted
-} from "../generated/OpsFlowProxy/OpsFlowProxy"
+import { TaskCreated } from "../generated/OpsFlowProxy/OpsFlowProxy"
 import { TaskOrder } from "../generated/schema"
 import { ACTIVE, checkFlowEntityExists, TASK } from "./helpers"
-
-
-// export function handleTaskCancelled(event: TaskCancelled): void { }
 
 /**
  * 
@@ -28,6 +20,7 @@ export function handleTaskCreated(event: TaskCreated): void {
     taskOrder.lastExecTime = task.lastExecTime
     taskOrder.interval = task.interval
     taskOrder.blockTime = event.block.timestamp
+    entity.blockTime = event.block.timestamp
     taskOrder.save()
 
     entity.admin = event.params.user.toHexString()
@@ -37,7 +30,3 @@ export function handleTaskCreated(event: TaskCreated): void {
     entity.deadline = task.deadline
     entity.save()
 }
-
-// export function handleTaskExecuted(event: TaskExecuted): void { }
-
-// export function handleOwnershipTransferred(event: OwnershipTransferred): void { }

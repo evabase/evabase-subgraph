@@ -5,13 +5,12 @@ import {
     FlowCreated,
     FlowExecuteFailed,
     FlowExecuteSuccess,
-    FlowUpdated
 } from "../generated/EvaFlowController/EvaFlowController"
 import { LOBExchange } from '../generated/LOBExchange/LOBExchange'
 import { Erc20Order, FlowEntity, FlowHistory } from "../generated/schema"
 import {
     ACTIVE, checkFlowEntityExists, CLOSED_ACTION, CREATE_ACTION, ERC20,
-    evaFlowController, EXPIRED, FAILED_ACTION, getFlowStatus, lobBExchange, saveFlowHistory, SUCCESS, SUCCESS_ACTION, ZERO_BI, evaFlowStatusUpkeep, CANCEL, handSuccessAndFailedEvent
+    evaFlowController, EXPIRED, FAILED_ACTION, lobBExchange, saveFlowHistory, SUCCESS, SUCCESS_ACTION, ZERO_BI, CANCELED, handSuccessAndFailedEvent
 } from "./helpers"
 
 /**
@@ -42,6 +41,7 @@ export function handleFlowCreated(event: FlowCreated): void {
             erc20Order.deadline = orderInfo.value0.deadline
             erc20Order.receiptor = orderInfo.value0.receiptor.toHexString()
             erc20Order.minInputPer = orderInfo.value0.minInputPer
+            entity.blockTime = event.block.timestamp
             erc20Order.blockTime = event.block.timestamp
             erc20Order.save()
 
@@ -101,10 +101,19 @@ export function handleFlowClosed(event: FlowClosed): void {
 
             let input = event.transaction.input
             if (input.toHexString().substr(0, 10).toLowerCase() == "0x7bbaf1ea".toLowerCase()) {
+                let blockNumber = event.block.number
                 entity.closeStatus = EXPIRED
+                let oldBlockNumber = entity.get("blockNumber")
+                if (oldBlockNumber) {
+                    if (entity.blockNumber == blockNumber) {
+                        entity.closeStatus = SUCCESS
+                    }
+                }
+            } else if (input.toHexString().substr(0, 10).toLowerCase() == "0x1b0f7ba9".toLowerCase()) {
+                entity.closeStatus = CANCELED
             } else {
                 if (deadlineEntity < blockTime) {
-                    entity.closeStatus = CANCEL
+                    entity.closeStatus = CANCELED
                 } else {
                     entity.closeStatus = SUCCESS
                 }
@@ -126,12 +135,11 @@ export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
     let reason = event.params.reason
     let blockIime = event.block.timestamp
     let from = event.transaction.from.toHexString()
-    handSuccessAndFailedEvent(flowId, hash, index, FAILED_ACTION, reason, false, fee, ethGasFee, evaGasFee, blockIime, from)
-    let entity = FlowEntity.load(flowId)
+    let blockNumber = event.block.number
+    handSuccessAndFailedEvent(flowId, hash, index, FAILED_ACTION, reason, false, fee, ethGasFee, evaGasFee, blockIime, from, blockNumber)
 }
 
 export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void {
-
     let flowId = event.params.flowId.toString()
     let fee = event.params.gasUsed
     let ethGasFee = event.params.payAmountByETH
@@ -141,7 +149,7 @@ export function handleFlowExecuteSuccess(event: FlowExecuteSuccess): void {
     let reason = ""
     let blockIime = event.block.timestamp
     let from = event.transaction.from.toHexString()
-    handSuccessAndFailedEvent(flowId, hash, index, SUCCESS_ACTION, reason, true, fee, ethGasFee, evaGasFee, blockIime, from)
+    let blockNumber = event.block.number
+    handSuccessAndFailedEvent(flowId, hash, index, SUCCESS_ACTION, reason, true, fee, ethGasFee, evaGasFee, blockIime, from, blockNumber)
 }
-// export function handleFlowUpdated(event: FlowUpdated): void { }
 

@@ -229,6 +229,40 @@ export class FlowEntity extends Entity {
     }
   }
 
+  get blockTime(): BigInt | null {
+    let value = this.get("blockTime");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set blockTime(value: BigInt | null) {
+    if (!value) {
+      this.unset("blockTime");
+    } else {
+      this.set("blockTime", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get blockNumber(): BigInt | null {
+    let value = this.get("blockNumber");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set blockNumber(value: BigInt | null) {
+    if (!value) {
+      this.unset("blockNumber");
+    } else {
+      this.set("blockNumber", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
   get details(): Array<string> | null {
     let value = this.get("details");
     if (!value || value.kind == ValueKind.NULL) {
@@ -329,23 +363,6 @@ export class FlowHistory extends Entity {
     }
   }
 
-  get blockTime(): BigInt | null {
-    let value = this.get("blockTime");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set blockTime(value: BigInt | null) {
-    if (!value) {
-      this.unset("blockTime");
-    } else {
-      this.set("blockTime", Value.fromBigInt(<BigInt>value));
-    }
-  }
-
   get action(): string | null {
     let value = this.get("action");
     if (!value || value.kind == ValueKind.NULL) {
@@ -360,6 +377,23 @@ export class FlowHistory extends Entity {
       this.unset("action");
     } else {
       this.set("action", Value.fromString(<string>value));
+    }
+  }
+
+  get blockTime(): BigInt | null {
+    let value = this.get("blockTime");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set blockTime(value: BigInt | null) {
+    if (!value) {
+      this.unset("blockTime");
+    } else {
+      this.set("blockTime", Value.fromBigInt(<BigInt>value));
     }
   }
 
@@ -823,12 +857,20 @@ export class TaskOrder extends Entity {
     this.set("interval", Value.fromBigInt(value));
   }
 
-  get blockTime(): BigInt {
+  get blockTime(): BigInt | null {
     let value = this.get("blockTime");
-    return value!.toBigInt();
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set blockTime(value: BigInt) {
-    this.set("blockTime", Value.fromBigInt(value));
+  set blockTime(value: BigInt | null) {
+    if (!value) {
+      this.unset("blockTime");
+    } else {
+      this.set("blockTime", Value.fromBigInt(<BigInt>value));
+    }
   }
 }
