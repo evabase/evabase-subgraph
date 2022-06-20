@@ -6,11 +6,11 @@ import { FlowEntity, FlowHistory } from "../generated/schema"
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 
-export const evaFlowController = '0x7eA10f2840c8B6E734697D998043653C25139C47'
-export const lobBExchange = '0x548C85Eb46d6A318731a97047243Cced24179066'
-export const opsFlowProxy = '0xeb921673666678c8648A0aAa3fC15Ad7EC51bfB8'
-export const nftLimitOrderFlow = '0xB011B927Cb38F2433164562283aeD25C59794F7B'
-export const evaFlowStatusUpkeep = "0xFaBbf45C33d41eF1a41d687d43F4b0B3ec89eeC1"
+export const evaFlowController = '0x8Ff32be5613eE683ecD617754204C62cAf4B490A'
+export const lobBExchange = '0x2A4Cc61bFF55d39d0c8d99835bbb3fb8dB0FC0d0'
+export const opsFlowProxy = '0xE0f3624BFdad35C21c8cBeF7894Ea75F17A47070'
+export const nftLimitOrderFlow = '0xD23276197D3f6B72D7E26b7f5791Ec757223206e'
+export const evaFlowStatusUpkeep = "0xDe3c0bB6092c0f8cD50106bb114149f3302BA578"
 
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
