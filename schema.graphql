@@ -1,48 +1,79 @@
 type FlowEntity @entity {
   id: ID!
-  flowStatus: Int!
-  keepNetWork: Int!
-  admin: String!
-  lastKeeper: String
-  lastVersionflow: String
-  lastExecNumber: BigInt
-  maxVaildBlockNumber: BigInt
-  flowName: String!
-  input: Bytes!
-  details: [FlowHistory!]!
+  flowStatus: FlowStatus
+  closeStatus: String
+  flowType: String
+  admin: String
+#  lastKeeper: String
+#  lastVersionflow: String
+#  lastExecNumber: BigInt
+#  maxVaildBlockNumber: BigInt
+  deadline: BigInt
+  flowName: String
+  input: Bytes
+  gasFees: BigInt
+  nftOrder: NftOrder
+  erc20Order: Erc20Order
+  taskOrder: TaskOrder
+  blockTime: BigInt
+  blockNumber: BigInt
+  details: [FlowHistory!]
 }
 
 type FlowHistory @entity(immutable: true) {
   #event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   id: ID!
-  # orderId: String
+  txHash: String
+  flowId: String
   gasUsed: BigInt
+  action: String
+  blockTime: BigInt
+  from: String
+  ethGasFee: BigInt
+  evaGasFee: BigInt
+  content: String
+  success: Boolean
+  failedReason: String
+}
+
+type NftOrder @entity {
+  id: ID!
+  owner: String #拥有人
+  assetToken: String #资产合约地址
+  amount: BigInt #NFT数量
+  price: BigInt #NFT价格
+  deadline: BigInt #订单过期时间 s
+  tokenId: BigInt
   blockTime: BigInt
 }
 
-# type NftOrder @entity {
-#   id: ID!
-#   orderStatus: Int
-#   owner: String #拥有人
-#   assetToken: String #资产合约地址
-#   amount: BigInt #NFT数量
-#   price: BigInt #NFT价格
-#   expireTime: BigInt #订单过期时间 s
-#   tokenId: BigInt
-#   salt: BigInt #随机数
-#   input: Bytes
-#   # details: [FlowHistory]
-# }
+type Erc20Order @entity {
+  id: ID!
+  owner: String!
+  inputAmount: BigInt!
+  inputToken: String!
+  minRate: BigInt!
+  outputToken: String!
+  deadline: BigInt!
+  receiptor: String!
+  minInputPer: BigInt!
+  blockTime: BigInt
+}
 
-# type Erc20Order @entity {
-#   id: ID!
-#   orderStatus: Int!
-#   owner: String!
-#   inputAmount: BigInt!
-#   inputToken: String!
-#   minRate: BigInt!
-#   outputToken: String!
-#   expiration: BigInt!
-#   receiptor: String!
-#   minInputPer: BigInt!
-# }
+type TaskOrder @entity{
+  id: ID!
+  owner: String!
+  input: [Bytes!]
+  startTime: BigInt!
+  deadline: BigInt!
+  lastExecTime: BigInt!
+  interval: BigInt!
+  blockTime: BigInt
+}
+
+enum FlowStatus {
+  Active
+  Success
+  Expired
+  Canceled
+}

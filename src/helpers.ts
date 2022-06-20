@@ -1,140 +1,173 @@
 /* eslint-disable prefer-const */
-import { log, BigInt, BigDecimal, Address, Bytes,ethereum,ByteArray } from '@graphprotocol/graph-ts'
+import { BigInt, BigDecimal, ethereum, Address } from '@graphprotocol/graph-ts'
 import { EvaFlowController } from '../generated/EvaFlowController/EvaFlowController'
-import { FlowEntity,FlowHistory } from "../generated/schema"
+import { FlowEntity, FlowHistory } from "../generated/schema"
 
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-export const EVAFLOW_CONTROLLER_ADDRESS = '0x93821553172b6A6745eEcB2e90f8c07f2fe24AAb'
-export let ZERO= 0
+
+export const evaFlowController = '0x7eA10f2840c8B6E734697D998043653C25139C47'
+export const lobBExchange = '0x548C85Eb46d6A318731a97047243Cced24179066'
+export const opsFlowProxy = '0xeb921673666678c8648A0aAa3fC15Ad7EC51bfB8'
+export const nftLimitOrderFlow = '0xB011B927Cb38F2433164562283aeD25C59794F7B'
+export const evaFlowStatusUpkeep = "0xFaBbf45C33d41eF1a41d687d43F4b0B3ec89eeC1"
+
+export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
+export let NULL_STRING = ''
 export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
+export let CREATE_ACTION = '1'
+export let UPGRADE_ACTION = '2'
+export let SUCCESS_ACTION = '3'
+export let FAILED_ACTION = '4'
+export let CLOSED_ACTION = '5'
 
-export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
-  let bd = BigDecimal.fromString('1')
-  for (let i = ZERO_BI; i.lt(decimals as BigInt); i = i.plus(ONE_BI)) {
-    bd = bd.times(BigDecimal.fromString('10'))
+export let ACTIVE = 'Active'
+export let SUCCESS = 'Success'
+export let EXPIRED = 'Expired'
+export let CANCELED = 'Canceled'
+
+export let NFT = 'NFT'
+export let ERC20 = 'ERC20'
+export let TASK = 'TASK'
+
+enum TokenStatus {
+  OriginalOwner,
+  SecondOwner,
+  ThirdOwner
+}
+
+
+/**
+ * 检查是否已经创建flowEntity 如果没有则创建一个新的flowEntity
+ * @param flowId 
+ * @returns 
+ */
+export function checkFlowEntityExists(flowId: string): FlowEntity {
+  let entity = FlowEntity.load(flowId)
+  if (!entity) {
+    entity = new FlowEntity(flowId)
   }
-  return bd
+  return entity
 }
 
-export enum FlowFunction {
-  FlowDestroyed,
-  FlowExecuteFailed,
-  FlowExecuteSuccess,
-  FlowPaused,
-  FlowStart,
-  FlowUpdated,
-
-}
-
-export function bigDecimalExp18(): BigDecimal {
-  return BigDecimal.fromString('1000000000000000000')
-}
-
-
-export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: BigInt): BigDecimal {
-  if (exchangeDecimals == ZERO_BI) {
-    return tokenAmount.toBigDecimal()
-  }
-  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals))
-}
-
-export function equalToZero(value: BigDecimal): boolean {
-  const formattedVal = parseFloat(value.toString())
-  const zero = parseFloat(ZERO_BD.toString())
-  if (zero == formattedVal) {
-    return true
-  }
-  return false
-}
-
-export function isNullEthValue(value: string): boolean {
-  return value == '0x0000000000000000000000000000000000000000000000000000000000000001'
-}
-
-export function saveFlow(flow: FlowEntity): void {
-  // static definitions overrides
-
-  let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
-
-  // try types string and bytes32 for symbol
-  let result = contract.getFlowMetas(BigInt.fromString(flow.id))
-  if (result) {
-    flow.flowStatus = result.flowStatus
-    flow.keepNetWork = result.keepNetWork
-    flow.flowName = result.flowName
-    flow.lastKeeper = result.lastKeeper.toHexString()
-    flow.lastExecNumber = result.lastExecNumber
-    flow.maxVaildBlockNumber = result.maxVaildBlockNumber
-    flow.lastVersionflow = result.lastVersionflow.toHexString()
-    flow.save()
+/**
+ * 获取flow状态
+ * @param flowId 
+ * @returns 
+ */
+export function getFlowStatus(flowId: string): string {
+  let contract = EvaFlowController.bind(Address.fromString(evaFlowController))
+  let result = contract.getFlowMetas(BigInt.fromString(flowId))
+  if (result.flowStatus > 0) {
+    return SUCCESS
+  } else {
+    return ACTIVE
   }
 }
 
-export function updateFlow(flow: FlowEntity,funType:FlowFunction) : void{
-    // static definitions overrides
-  
-    let contract = EvaFlowController.bind(Address.fromString(EVAFLOW_CONTROLLER_ADDRESS))
-  
-    // try types string and bytes32 for symbol
-    let result = contract.getFlowMetas(BigInt.fromString(flow.id))
-    if (result) {
-      if (funType == FlowFunction.FlowDestroyed ||
-        funType == FlowFunction.FlowPaused ||
-        funType == FlowFunction.FlowStart ) { 
-        flow.flowStatus = result.flowStatus
-        flow.lastExecNumber = result.lastExecNumber
+/**
+ * 保存FlowHistory详细信息
+ * @param flowHistory 
+ * @param flowEntity 
+ * @param event 
+ * @param fee 
+ * @param action 
+ * @param ethGasFee 
+ * @param evaGasFee 
+ * @param flowId 
+ * @param txHash 
+ * @param success 
+ */
+export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity,
+  fee: BigInt,
+  action: string,
+  ethGasFee: BigInt,
+  evaGasFee: BigInt,
+  flowId: string,
+  txHash: string,
+  success: boolean,
+  blockTime: BigInt,
+  from: string
+): void {
+
+  flowHistory.gasUsed = fee
+  flowHistory.blockTime = blockTime
+  flowHistory.action = action
+  flowHistory.from = from
+  flowHistory.ethGasFee = ethGasFee
+  flowHistory.evaGasFee = evaGasFee
+  flowHistory.flowId = flowId
+  flowHistory.txHash = txHash
+  flowHistory.success = success
+
+  let isFlowType = flowEntity.get('flowType');
+  if (isFlowType) {
+    let type = flowEntity.flowType
+
+    if (action == CREATE_ACTION) {
+      if (type == NFT) {
+        flowHistory.content = 'Create NFT Order '
       }
-      if (
-        funType == FlowFunction.FlowUpdated) {
-        flow.flowName = result.flowName
-        flow.lastVersionflow = result.lastVersionflow.toHexString()
-        
+      if (type == ERC20) {
+        flowHistory.content = 'Create ERC20 Limit Order'
       }
-
-      if (funType == FlowFunction.FlowExecuteFailed ||
-        funType == FlowFunction.FlowExecuteSuccess ||
-        funType == FlowFunction.FlowUpdated) {
-        flow.lastKeeper = result.lastKeeper.toHexString()
-        flow.lastExecNumber = result.lastExecNumber
+      if (type == TASK) {
+        flowHistory.content = 'Create Task'
       }
+    } else if (action == SUCCESS_ACTION) {
+      if (type == NFT) {
+        flowHistory.content = 'Buy NFT Item'
+      }
+      if (type == ERC20) {
+        flowHistory.content = 'Buy Token'
+      }
+      if (type == TASK) {
+        flowHistory.content = 'Execute Task'
+      }
+    } else if (action == FAILED_ACTION) {
+      if (type == NFT) {
+        flowHistory.content = 'Buy NFT Item'
+      }
+      if (type == ERC20) {
+        flowHistory.content = 'Buy Token'
+      }
+      if (type == TASK) {
+        flowHistory.content = 'Execute Task'
+      }
+    } else if (action == CLOSED_ACTION) {
+      flowHistory.content = 'Close Flow'
+    }
+  }
+  flowHistory.save()
+}
 
-      flow.save()
+export function handSuccessAndFailedEvent(flowId: string, hash: string, index: BigInt, action: string,
+  failedReason: string, success: boolean, fee: BigInt, ethGasFee: BigInt,
+  evaGasFee: BigInt, blockTime: BigInt, from: string, blockNumber: BigInt): void {
+  let entity = FlowEntity.load(flowId)
+  if (entity) {
+    let flowHistory = new FlowHistory(hash + index.toString())
+
+    flowHistory.failedReason = failedReason
+    saveFlowHistory(flowHistory, entity, fee, action, ethGasFee, evaGasFee, flowId, hash, success, blockTime, from)
+
+    let newdetails = entity.details
+    if (newdetails) {
+      newdetails.push(flowHistory.id)
+      entity.details = newdetails
     }
 
-}
-
-export function saveFlowHistory(flowHistory: FlowHistory, event: ethereum.Event,fee:BigInt): void {
-  
-  flowHistory.blockTime = event.block.timestamp
-  flowHistory.gasUsed = ZERO_BI
-  flowHistory.save()
-
-}
-
-export function paraOrderInput(input: Bytes,flowHistory: FlowHistory): void {
-  // let decoded =  ethers.utils.AbiCoder.prototype.decode(['address', 'uint8', 'bytes'],input)  
-  // const functionInput = input.subarray(4);
-
-  const inputDataHexString = input.toHexString().slice(10); //take away function signature: '0x????????'
-  const hexStringToDecode = '0x0000000000000000000000000000000000000000000000000000000000000020' + inputDataHexString; // prepend tuple offset
-  let functionInput= Bytes.fromByteArray(Bytes.fromHexString(hexStringToDecode));
-  
-  
-  let origin = ethereum.decode('address,uint8,bytes', functionInput)
-  if (origin) {
-    let decoded =origin.toTuple()
-    let dest = decoded[0]
-    let howToCall = decoded[1]
-    let calldata = decoded[2]
-    flowHistory.orderId = dest.toAddress().toHexString()
-    flowHistory.gasUsed = howToCall.toBigInt()
-    flowHistory.save ()
+    entity.flowStatus = getFlowStatus(flowId)
+    let gasFee = entity.gasFees;
+    if (gasFee) {
+      let allGas = gasFee.plus(ethGasFee)
+      entity.gasFees = allGas
+    }
+    entity.blockNumber = blockNumber
+    entity.save()
   }
-  
 }
-
