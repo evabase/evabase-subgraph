@@ -1,17 +1,7 @@
 /* eslint-disable prefer-const */
-import { BigInt, BigDecimal, ethereum, Address } from '@graphprotocol/graph-ts'
-import { EvaFlowController } from '../generated/EvaFlowController/EvaFlowController'
+import { BigInt, BigDecimal } from '@graphprotocol/graph-ts'
 import { FlowEntity, FlowHistory } from "../generated/schema"
-
-
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
-
-export const evaFlowController = '0x7eA10f2840c8B6E734697D998043653C25139C47'
-export const lobBExchange = '0x548C85Eb46d6A318731a97047243Cced24179066'
-export const opsFlowProxy = '0xeb921673666678c8648A0aAa3fC15Ad7EC51bfB8'
-export const nftLimitOrderFlow = '0xB011B927Cb38F2433164562283aeD25C59794F7B'
-export const evaFlowStatusUpkeep = "0xFaBbf45C33d41eF1a41d687d43F4b0B3ec89eeC1"
-
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -34,12 +24,6 @@ export let NFT = 'NFT'
 export let ERC20 = 'ERC20'
 export let TASK = 'TASK'
 
-enum TokenStatus {
-  OriginalOwner,
-  SecondOwner,
-  ThirdOwner
-}
-
 
 /**
  * 检查是否已经创建flowEntity 如果没有则创建一个新的flowEntity
@@ -52,21 +36,6 @@ export function checkFlowEntityExists(flowId: string): FlowEntity {
     entity = new FlowEntity(flowId)
   }
   return entity
-}
-
-/**
- * 获取flow状态
- * @param flowId 
- * @returns 
- */
-export function getFlowStatus(flowId: string): string {
-  let contract = EvaFlowController.bind(Address.fromString(evaFlowController))
-  let result = contract.getFlowMetas(BigInt.fromString(flowId))
-  if (result.flowStatus > 0) {
-    return SUCCESS
-  } else {
-    return ACTIVE
-  }
 }
 
 /**
@@ -110,36 +79,23 @@ export function saveFlowHistory(flowHistory: FlowHistory, flowEntity: FlowEntity
 
     if (action == CREATE_ACTION) {
       if (type == NFT) {
-        flowHistory.content = 'Create NFT Order '
+        flowHistory.content = 'create NFT order'
       }
       if (type == ERC20) {
-        flowHistory.content = 'Create ERC20 Limit Order'
+        flowHistory.content = 'create ERC20 limit order'
       }
       if (type == TASK) {
-        flowHistory.content = 'Create Task'
+        flowHistory.content = 'create task'
       }
-    } else if (action == SUCCESS_ACTION) {
-      if (type == NFT) {
-        flowHistory.content = 'Buy NFT Item'
-      }
-      if (type == ERC20) {
-        flowHistory.content = 'Buy Token'
+    } else if (action == SUCCESS_ACTION || action == FAILED_ACTION) {
+      if (type == NFT || type == ERC20) {
+        flowHistory.content = 'buy'
       }
       if (type == TASK) {
-        flowHistory.content = 'Execute Task'
-      }
-    } else if (action == FAILED_ACTION) {
-      if (type == NFT) {
-        flowHistory.content = 'Buy NFT Item'
-      }
-      if (type == ERC20) {
-        flowHistory.content = 'Buy Token'
-      }
-      if (type == TASK) {
-        flowHistory.content = 'Execute Task'
+        flowHistory.content = 'execute'
       }
     } else if (action == CLOSED_ACTION) {
-      flowHistory.content = 'Close Flow'
+      flowHistory.content = 'close flow'
     }
   }
   flowHistory.save()
@@ -150,8 +106,7 @@ export function handSuccessAndFailedEvent(flowId: string, hash: string, index: B
   evaGasFee: BigInt, blockTime: BigInt, from: string, blockNumber: BigInt): void {
   let entity = FlowEntity.load(flowId)
   if (entity) {
-    let flowHistory = new FlowHistory(hash + index.toString())
-
+    let flowHistory = new FlowHistory(hash + "#" + index.toString())
     flowHistory.failedReason = failedReason
     saveFlowHistory(flowHistory, entity, fee, action, ethGasFee, evaGasFee, flowId, hash, success, blockTime, from)
 
@@ -160,13 +115,7 @@ export function handSuccessAndFailedEvent(flowId: string, hash: string, index: B
       newdetails.push(flowHistory.id)
       entity.details = newdetails
     }
-
-    entity.flowStatus = getFlowStatus(flowId)
-    let gasFee = entity.gasFees;
-    if (gasFee) {
-      let allGas = gasFee.plus(ethGasFee)
-      entity.gasFees = allGas
-    }
+    entity.gasFees = entity.gasFees!.plus(ethGasFee)
     entity.blockNumber = blockNumber
     entity.save()
   }

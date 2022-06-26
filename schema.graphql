@@ -21,7 +21,7 @@ type FlowEntity @entity {
 }
 
 type FlowHistory @entity(immutable: true) {
-  #event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+  #event.transaction.hash.toHex() + "#" + event.logIndex.toString()
   id: ID!
   txHash: String
   flowId: String

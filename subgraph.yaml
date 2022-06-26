@@ -30,6 +30,7 @@ dataSources:
         - event: FlowExecuteSuccess(indexed address,indexed uint256,uint120,uint120,uint256)
           handler: handleFlowExecuteSuccess
       file: ./src/mapping.ts
+
   - kind: ethereum
     name: NftLimitOrderFlowProxy
     network: rinkeby
@@ -71,3 +72,24 @@ dataSources:
         - event: TaskCreated(indexed address,indexed uint256,(address,bytes[],uint64,uint64,uint64,uint64))
           handler: handleTaskCreated
       file: ./src/opsmapping.ts
+  
+  - kind: ethereum
+    name: LOBExchange
+    network: rinkeby
+    source:
+      address: '0x548C85Eb46d6A318731a97047243Cced24179066'
+      abi: LOBExchange
+      startBlock: 10740951
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - FlowEntity
+      abis:
+        - name: LOBExchange
+          file: ./abis/LOBExchange.abi.json
+      eventHandlers:
+        - event: OrderCreated(indexed bytes32,indexed address,uint256)
+          handler: handleOrderCreated
+      file: ./src/lobmapping.ts

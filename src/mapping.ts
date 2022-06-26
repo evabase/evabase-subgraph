@@ -1,4 +1,4 @@
-import { BigInt, Address, Bytes } from '@graphprotocol/graph-ts'
+import { BigInt } from '@graphprotocol/graph-ts'
 import {
     EvaFlowController,
     FlowClosed,
@@ -6,11 +6,10 @@ import {
     FlowExecuteFailed,
     FlowExecuteSuccess,
 } from "../generated/EvaFlowController/EvaFlowController"
-import { LOBExchange } from '../generated/LOBExchange/LOBExchange'
-import { Erc20Order, FlowEntity, FlowHistory } from "../generated/schema"
+import { Erc20Order, FlowEntity, FlowHistory, NftOrder, TaskOrder } from "../generated/schema"
 import {
     ACTIVE, checkFlowEntityExists, CLOSED_ACTION, CREATE_ACTION, ERC20,
-    evaFlowController, EXPIRED, FAILED_ACTION, lobBExchange, saveFlowHistory, SUCCESS, SUCCESS_ACTION, ZERO_BI, CANCELED, handSuccessAndFailedEvent
+    EXPIRED, FAILED_ACTION, saveFlowHistory, SUCCESS, SUCCESS_ACTION, ZERO_BI, CANCELED, handSuccessAndFailedEvent, NFT, TASK
 } from "./helpers"
 
 /**
@@ -20,70 +19,55 @@ import {
 export function handleFlowCreated(event: FlowCreated): void {
     let flowId = event.params.flowId.toString()
     let entity = checkFlowEntityExists(flowId)
+    let checkData = event.params.checkData.toHexString()
 
-    // 获取erc20 相关数据
-    let contract = EvaFlowController.bind(Address.fromString(evaFlowController))
-    let result = contract.getFlowMetas(BigInt.fromString(flowId))
-
-    let checkData = event.params.checkData
-    let lastVersion = result.lastVersionflow.toHexString()
-    if (lastVersion.toLowerCase() == lobBExchange.toLowerCase()) {
-        let lobContract = LOBExchange.bind(Address.fromString(lobBExchange))
-        let orderInfo = lobContract.getOrderInfo(Bytes.fromByteArray(checkData))
-        if (orderInfo) {
-
-            let erc20Order = new Erc20Order(flowId)
-            erc20Order.owner = orderInfo.value0.owner.toHexString()
-            erc20Order.inputAmount = orderInfo.value0.inputAmount
-            erc20Order.inputToken = orderInfo.value0.inputToken.toHexString()
-            erc20Order.minRate = orderInfo.value0.minRate
-            erc20Order.outputToken = orderInfo.value0.outputToken.toHexString()
-            erc20Order.deadline = orderInfo.value0.deadline
-            erc20Order.receiptor = orderInfo.value0.receiptor.toHexString()
-            erc20Order.minInputPer = orderInfo.value0.minInputPer
-            entity.blockTime = event.block.timestamp
-            erc20Order.blockTime = event.block.timestamp
-            erc20Order.save()
-
-            entity.flowType = ERC20
-            entity.deadline = orderInfo.value0.deadline
-            entity.erc20Order = erc20Order.id
-        }
+    if (NftOrder.load(flowId)) {
+        entity.nftOrder = NftOrder.load(flowId)!.id
+        entity.flowType = NFT
+        entity.deadline = NftOrder.load(flowId)!.deadline
+    }
+    if (TaskOrder.load(flowId)) {
+        entity.taskOrder = TaskOrder.load(flowId)!.id
+        entity.flowType = TASK
+        entity.deadline = TaskOrder.load(flowId)!.deadline
+    }
+    if (Erc20Order.load(checkData)) {
+        entity.erc20Order = Erc20Order.load(checkData)!.id
+        entity.flowType = ERC20
+        entity.deadline = Erc20Order.load(checkData)!.deadline
     }
 
     let createHash = event.transaction.hash.toHexString()
     let index = event.logIndex
-    let flowHistory = new FlowHistory(createHash + index.toString())
+    let flowHistory = new FlowHistory(createHash + "#" + index.toString())
     let blockIime = event.block.timestamp
     let from = event.transaction.from.toHexString()
     saveFlowHistory(flowHistory, entity, ZERO_BI, CREATE_ACTION, ZERO_BI, ZERO_BI, flowId, createHash, true, blockIime, from)
-
     entity.details = [flowHistory.id]
-    entity.flowName = result.flowName
+
+    let contract = EvaFlowController.bind(event.address)
+    let result = contract.getFlowMetas(BigInt.fromString(flowId))
+
     entity.flowStatus = ACTIVE
     entity.admin = event.params.user.toHexString()
+    entity.flowName = result.flowName
     entity.gasFees = ZERO_BI
+    entity.blockTime = entity.blockTime
+    entity.blockNumber = entity.blockNumber
     entity.save()
+
 }
 
 export function handleFlowClosed(event: FlowClosed): void {
     let flowId = event.params.flowId.toString()
     let entity = FlowEntity.load(flowId)
 
-    // Entities only exist after they have been saved to the store;
-    // `null` checks allow to create entities on demand
     if (entity) {
-        let contract = EvaFlowController.bind(Address.fromString(evaFlowController))
-        let result = contract.getFlowMetas(BigInt.fromString(flowId))
-        if (result.flowStatus > 0) {
-            entity.flowStatus = SUCCESS
-        } else {
-            entity.flowStatus = ACTIVE
-        }
+        entity.flowStatus = SUCCESS
 
         let createHash = event.transaction.hash.toHexString()
         let index = event.logIndex
-        let flowHistory = new FlowHistory(createHash + index.toString())
+        let flowHistory = new FlowHistory(createHash + "#" + index.toString())
         let blockIime = event.block.timestamp
         let from = event.transaction.from.toHexString()
         saveFlowHistory(flowHistory, entity, ZERO_BI, CLOSED_ACTION, ZERO_BI, ZERO_BI, flowId, createHash, true, blockIime, from)
@@ -112,7 +96,7 @@ export function handleFlowClosed(event: FlowClosed): void {
             } else if (input.toHexString().substr(0, 10).toLowerCase() == "0x1b0f7ba9".toLowerCase()) {
                 entity.closeStatus = CANCELED
             } else {
-                if (deadlineEntity < blockTime) {
+                if (deadlineEntity! < blockTime) {
                     entity.closeStatus = CANCELED
                 } else {
                     entity.closeStatus = SUCCESS
@@ -122,8 +106,6 @@ export function handleFlowClosed(event: FlowClosed): void {
         entity.save()
     }
 }
-
-
 
 export function handleFlowExecuteFailed(event: FlowExecuteFailed): void {
     let flowId = event.params.flowId.toString()
