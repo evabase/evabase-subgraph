@@ -1218,16 +1218,12 @@ export class WithdrawFundByUserCall__Inputs {
     this._call = call;
   }
 
-  get recipient(): Address {
+  get tokenAdress(): Address {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get tokenAdress(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-
   get amount(): BigInt {
-    return this._call.inputValues[2].value.toBigInt();
+    return this._call.inputValues[1].value.toBigInt();
   }
 }
 
