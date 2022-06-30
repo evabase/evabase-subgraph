@@ -1,0 +1,38 @@
+{
+    "mainnet": {
+        "EvaFlowController": {
+            "address": "0x8Ff32be5613eE683ecD617754204C62cAf4B490A",
+            "startBlock": 14981941
+        },
+        "NftLimitOrderFlowProxy": {
+            "address": "0xD23276197D3f6B72D7E26b7f5791Ec757223206e",
+            "startBlock": 14981995
+        },
+        "OpsFlowProxy": {
+            "address": "0xE0f3624BFdad35C21c8cBeF7894Ea75F17A47070",
+            "startBlock": 14982068
+        },
+        "LOBExchange": {
+            "address": "0x2A4Cc61bFF55d39d0c8d99835bbb3fb8dB0FC0d0",
+            "startBlock": 14982119
+        }
+    },
+    "rinkeby": {
+        "EvaFlowController": {
+            "address": "0x7eA10f2840c8B6E734697D998043653C25139C47",
+            "startBlock": 10740951
+        },
+        "NftLimitOrderFlowProxy": {
+            "address": "0xB011B927Cb38F2433164562283aeD25C59794F7B",
+            "startBlock": 10740951
+        },
+        "OpsFlowProxy": {
+            "address": "0xeb921673666678c8648A0aAa3fC15Ad7EC51bfB8",
+            "startBlock": 10740951
+        },
+        "LOBExchange": {
+            "address": "0x548C85Eb46d6A318731a97047243Cced24179066",
+            "startBlock": 10740951
+        }
+    }
+}
