@@ -2,6 +2,16 @@
 import { BigInt, BigDecimal } from '@graphprotocol/graph-ts'
 import { FlowEntity, FlowHistory, TvlSummary } from "../generated/schema"
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
+<<<<<<< HEAD
+=======
+
+export const evaFlowController = '0x8Ff32be5613eE683ecD617754204C62cAf4B490A'
+export const lobBExchange = '0x2A4Cc61bFF55d39d0c8d99835bbb3fb8dB0FC0d0'
+export const opsFlowProxy = '0xE0f3624BFdad35C21c8cBeF7894Ea75F17A47070'
+export const nftLimitOrderFlow = '0xD23276197D3f6B72D7E26b7f5791Ec757223206e'
+export const evaFlowStatusUpkeep = "0xDe3c0bB6092c0f8cD50106bb114149f3302BA578"
+
+>>>>>>> 9a08646cad6729352ba7e99decf6741d2e76842b
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)

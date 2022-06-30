@@ -4,11 +4,17 @@ schema:
 dataSources:
   - kind: ethereum
     name: EvaFlowController
-    network: rinkeby
+    network: mainnet
     source:
+<<<<<<< HEAD
       abi: EvaFlowController
       address: "0x7eA10f2840c8B6E734697D998043653C25139C47"
       startBlock: 10740951
+=======
+      address: '0x8Ff32be5613eE683ecD617754204C62cAf4B490A'
+      abi: EvaFlowController
+      startBlock: 14981941
+>>>>>>> 9a08646cad6729352ba7e99decf6741d2e76842b
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -34,11 +40,17 @@ dataSources:
       file: ./src/mapping.ts
   - kind: ethereum
     name: NftLimitOrderFlowProxy
-    network: rinkeby
+    network: mainnet
     source:
+<<<<<<< HEAD
       abi: NftLimitOrderFlowProxy
       address: "0xB011B927Cb38F2433164562283aeD25C59794F7B"
       startBlock: 10740951
+=======
+      address: '0xD23276197D3f6B72D7E26b7f5791Ec757223206e'
+      abi: NftLimitOrderFlowProxy
+      startBlock: 14981995 
+>>>>>>> 9a08646cad6729352ba7e99decf6741d2e76842b
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -57,11 +69,17 @@ dataSources:
       file: ./src/nftmapping.ts
   - kind: ethereum
     name: OpsFlowProxy
-    network: rinkeby
+    network: mainnet
     source:
+<<<<<<< HEAD
       abi: OpsFlowProxy
       address: "0xeb921673666678c8648A0aAa3fC15Ad7EC51bfB8"
       startBlock: 10740951
+=======
+      address: '0xE0f3624BFdad35C21c8cBeF7894Ea75F17A47070'
+      abi: OpsFlowProxy
+      startBlock: 14982068
+>>>>>>> 9a08646cad6729352ba7e99decf6741d2e76842b
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
