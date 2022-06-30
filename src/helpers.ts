@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 import { BigInt, BigDecimal } from '@graphprotocol/graph-ts'
-import { FlowEntity, FlowHistory } from "../generated/schema"
+import { FlowEntity, FlowHistory, TvlSummary } from "../generated/schema"
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export let ZERO = 0
 export let ZERO_BI = BigInt.fromI32(0)
@@ -118,5 +118,20 @@ export function handSuccessAndFailedEvent(flowId: string, hash: string, index: B
     entity.gasFees = entity.gasFees!.plus(ethGasFee)
     entity.blockNumber = blockNumber
     entity.save()
+  }
+}
+
+export function addTvlSummary(flowType: string, currency: string, amount: BigInt): void {
+  let key = flowType + "#" + currency
+  let tvlSummary = TvlSummary.load(key)
+  if (tvlSummary) {
+    tvlSummary.amount = tvlSummary.amount.plus(amount)
+    tvlSummary.save()
+  } else {
+    tvlSummary = new TvlSummary(key)
+    tvlSummary.currency = currency
+    tvlSummary.amount = amount
+    tvlSummary.flowType = flowType
+    tvlSummary.save()
   }
 }

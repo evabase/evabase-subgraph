@@ -1,7 +1,8 @@
 import {
-    OrderCreated
+    OrderCreated, OrderExecuted
 } from "../generated/NftLimitOrderFlowProxy/NftLimitOrderFlowProxy"
-import { NftOrder } from "../generated/schema"
+import { NftOrder, TvlSummary } from "../generated/schema"
+import { addTvlSummary, NFT } from "./helpers"
 
 /**
  * 
@@ -21,3 +22,7 @@ export function handleOrderCreated(event: OrderCreated): void {
     nftOrder.save()
 }
 
+export function handleOrderExecuted(event: OrderExecuted): void {
+    let amount = event.params.value
+    addTvlSummary(NFT,"ETH",amount)
+}

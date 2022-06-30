@@ -77,3 +77,10 @@ enum FlowStatus {
   Expired
   Canceled
 }
+
+type TvlSummary @entity{
+  id: ID!
+  flowType:String!
+  currency:String!
+  amount: BigInt!
+}

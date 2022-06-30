@@ -50,6 +50,8 @@ dataSources:
       eventHandlers:
         - event: OrderCreated(indexed address,indexed uint256,(address,address,uint256,uint256,uint256,uint256,uint256))
           handler: handleOrderCreated
+        - event: OrderExecuted(indexed address,bytes32,uint256,uint256)
+          handler: handleOrderExecuted
       file: ./src/nftmapping.ts
 
   - kind: ethereum
@@ -92,4 +94,6 @@ dataSources:
       eventHandlers:
         - event: OrderCreated(indexed bytes32,indexed address,uint256)
           handler: handleOrderCreated
+        - event: OrderExecuted(indexed bytes32,uint256,uint256)
+          handler: handleOrderExecuted
       file: ./src/lobmapping.ts

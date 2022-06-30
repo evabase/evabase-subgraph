@@ -1,5 +1,6 @@
-import { LOBExchange, OrderCreated } from "../generated/LOBExchange/LOBExchange";
+import { LOBExchange, OrderCreated, OrderExecuted } from "../generated/LOBExchange/LOBExchange";
 import { Erc20Order } from "../generated/schema";
+import { addTvlSummary, ERC20 } from "./helpers";
 
 export function handleOrderCreated(event: OrderCreated): void {
     let address = event.address
@@ -18,3 +19,12 @@ export function handleOrderCreated(event: OrderCreated): void {
     erc20Order.blockTime = event.block.timestamp
     erc20Order.save()
 }
+
+export function handleOrderExecuted(event: OrderExecuted): void {
+    let orderId = event.params.orderId.toHexString()
+    let erc20 = Erc20Order.load(orderId)
+    let inputAmount = erc20!.inputAmount
+    let inputToken = erc20!.inputToken
+    addTvlSummary(ERC20, inputToken, inputAmount)
+}
+
