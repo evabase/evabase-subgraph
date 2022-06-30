@@ -6,8 +6,8 @@ dataSources:
     name: EvaFlowController
     network: rinkeby
     source:
-      address: '0x7eA10f2840c8B6E734697D998043653C25139C47'
       abi: EvaFlowController
+      address: "0x7eA10f2840c8B6E734697D998043653C25139C47"
       startBlock: 10740951
     mapping:
       kind: ethereum/events
@@ -25,19 +25,20 @@ dataSources:
           handler: handleFlowClosed
         - event: FlowCreated(indexed address,indexed uint256,address,bytes,uint256)
           handler: handleFlowCreated
-        - event: FlowExecuteFailed(indexed address,indexed uint256,uint120,uint120,uint256,string)
+        - event: FlowExecuteFailed(indexed address,indexed
+            uint256,uint120,uint120,uint256,string)
           handler: handleFlowExecuteFailed
-        - event: FlowExecuteSuccess(indexed address,indexed uint256,uint120,uint120,uint256)
+        - event: FlowExecuteSuccess(indexed address,indexed
+            uint256,uint120,uint120,uint256)
           handler: handleFlowExecuteSuccess
       file: ./src/mapping.ts
-
   - kind: ethereum
     name: NftLimitOrderFlowProxy
     network: rinkeby
     source:
-      address: '0xB011B927Cb38F2433164562283aeD25C59794F7B'
       abi: NftLimitOrderFlowProxy
-      startBlock: 10740951 
+      address: "0xB011B927Cb38F2433164562283aeD25C59794F7B"
+      startBlock: 10740951
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -48,18 +49,18 @@ dataSources:
         - name: NftLimitOrderFlowProxy
           file: ./abis/NftLimitOrderFlowProxy.abi.json
       eventHandlers:
-        - event: OrderCreated(indexed address,indexed uint256,(address,address,uint256,uint256,uint256,uint256,uint256))
+        - event: OrderCreated(indexed address,indexed
+            uint256,(address,address,uint256,uint256,uint256,uint256,uint256))
           handler: handleOrderCreated
         - event: OrderExecuted(indexed address,bytes32,uint256,uint256)
           handler: handleOrderExecuted
       file: ./src/nftmapping.ts
-
   - kind: ethereum
     name: OpsFlowProxy
     network: rinkeby
     source:
-      address: '0xeb921673666678c8648A0aAa3fC15Ad7EC51bfB8'
       abi: OpsFlowProxy
+      address: "0xeb921673666678c8648A0aAa3fC15Ad7EC51bfB8"
       startBlock: 10740951
     mapping:
       kind: ethereum/events
@@ -71,16 +72,16 @@ dataSources:
         - name: OpsFlowProxy
           file: ./abis/OpsFlowProxy.abi.json
       eventHandlers:
-        - event: TaskCreated(indexed address,indexed uint256,(address,bytes[],uint64,uint64,uint64,uint64))
+        - event: TaskCreated(indexed address,indexed
+            uint256,(address,bytes[],uint64,uint64,uint64,uint64))
           handler: handleTaskCreated
       file: ./src/opsmapping.ts
-  
   - kind: ethereum
     name: LOBExchange
     network: rinkeby
     source:
-      address: '0x548C85Eb46d6A318731a97047243Cced24179066'
       abi: LOBExchange
+      address: "0x548C85Eb46d6A318731a97047243Cced24179066"
       startBlock: 10740951
     mapping:
       kind: ethereum/events
