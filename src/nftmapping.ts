@@ -24,5 +24,5 @@ export function handleOrderCreated(event: OrderCreated): void {
 
 export function handleOrderExecuted(event: OrderExecuted): void {
     let amount = event.params.value
-    addTvlSummary(NFT,"ETH",amount)
+    addTvlSummary(NFT,"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",amount)
 }
