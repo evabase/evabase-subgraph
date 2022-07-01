@@ -932,4 +932,13 @@ export class TvlSummary extends Entity {
   set amount(value: BigInt) {
     this.set("amount", Value.fromBigInt(value));
   }
+
+  get active(): BigInt {
+    let value = this.get("active");
+    return value!.toBigInt();
+  }
+
+  set active(value: BigInt) {
+    this.set("active", Value.fromBigInt(value));
+  }
 }

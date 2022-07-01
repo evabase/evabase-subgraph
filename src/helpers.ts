@@ -126,12 +126,14 @@ export function addTvlSummary(flowType: string, currency: string, amount: BigInt
   let tvlSummary = TvlSummary.load(key)
   if (tvlSummary) {
     tvlSummary.amount = tvlSummary.amount.plus(amount)
+    tvlSummary.active = tvlSummary.active.plus(ONE_BI)
     tvlSummary.save()
   } else {
     tvlSummary = new TvlSummary(key)
     tvlSummary.currency = currency
     tvlSummary.amount = amount
     tvlSummary.flowType = flowType
+    tvlSummary.active = ONE_BI
     tvlSummary.save()
   }
 }

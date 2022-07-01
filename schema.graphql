@@ -83,4 +83,5 @@ type TvlSummary @entity{
   flowType:String!
   currency:String!
   amount: BigInt!
+  active: BigInt!
 }
